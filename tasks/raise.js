@@ -10,10 +10,10 @@ module.exports = function (node) {
 
     return function (context) {
 
-        return function(done) {
-            console.log("LOG>", workflow.readValue(node.message || "Log activity", context))
-            done();
-        }
-    }
+		return function(done) {
+            var a;
+            return a.a;
+		}
+	}
 
 }

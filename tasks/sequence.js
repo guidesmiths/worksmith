@@ -1,13 +1,22 @@
 var async = require('async')
-var workflow = require('./')
+var workflow = require('../')
 
 module.exports = function(node) {
-	return function(context) {
-		return function(done) {
-			var tasks = node.items.map(function(item) {
-				return workflow.define(item)(context)
-			})
-			async.series(tasks,done)
-		}
-	}
+
+    var steps = node.items.map(function(item) {
+            return workflow.define(item)
+        })
+
+    return function(context) {
+        var tasks = steps.map(function(step) {
+            return step(context);
+        })
+
+        function result(done) {
+            async.series(tasks,done)
+        }
+
+        return result;
+
+    }
 }
