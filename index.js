@@ -35,11 +35,14 @@ var workflow =  {
             if (!context[Symbol.for("initialized")]) {
                 context.get = function(name) {
                     return workflow.readValue(name, context)
+                },
+                context.set = function(name, value) {
+                    return workflow.setValue(context, name, value)
                 }
             }
         }
 
-        return function(context) {
+        return function build(context) {
             var decorated = wfInstance(context)
             var executed = false
             debug("workflow preparing: %s", workflowDefinition.task)
@@ -49,8 +52,9 @@ var workflow =  {
             return function execute(done) {
                 var orig = done,
                 done = function(err, result) {
+                    debug("workflow completed, result is", typeof result)
                     if (executed && workflowDefinition.resultTo) {
-                        utils.setValue(context, workflowDefinition.resultTo, result)
+                        workflow.setValue(context, workflowDefinition.resultTo, result)
                     }
                     debug("workflow executed: %s", workflowDefinition.task)
                     orig(err, result);
@@ -105,6 +109,8 @@ var workflow =  {
     },
 
     setValue: function (object, path, value) {
+        console.log("@@@@@@@@@@setvalue", arguments)
+        var parts = path.split('.');
         path = path.replace(/\[/g, ".").replace(/\]/g, "")
         var part;
         while (part = parts.shift()) {
@@ -112,6 +118,29 @@ var workflow =  {
                 object[part] = object[part] || {};
                 object = object[part];
             } else {
+
+                var mapDef = value
+
+                // var result
+                // var builders = {
+                //     "[object Array]": function(o) {
+                //         return o.map(function(item) {
+                //             return workflow.readValue(item, object)
+                //         })
+                //     },
+                //     "[object Object]": function(o) {
+                //         var result = {}
+                //          Object.keys(o).forEach(function(key) {
+
+                //             result[key] = workflow.readValue(key, object)
+                //         })
+                //          return result
+                //     }
+                // }
+
+                // value = (builders[Object.prototype.toString.call(mapDef)] || (function(o) { return o })) (mapDef)
+
+
                 object[part] = value;
             }
         }
