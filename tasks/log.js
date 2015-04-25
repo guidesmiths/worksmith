@@ -1,13 +1,15 @@
 var debug = require('debug')('workflow:activities:log')
 
-module.exports = function (node) {
+LogActivty.annotations = {inject: ["message"]}
+function LogActivty(node) {
 
     return function (context) {
 
-        return function(done) {
-            console.log("LOG>", context.get(node.message) || "Log activity")
+        return function(message, done) {
+            console.log("LOG>", message || "Log activity")
             done();
         }
     }
 
 }
+module.exports = LogActivty

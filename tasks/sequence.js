@@ -7,16 +7,17 @@ module.exports = function(node) {
             return workflow.define(item)
         })
 
-    return function(context) {
+    return function build(context) {
+
         var tasks = steps.map(function(step) {
             return step(context);
         })
 
-        function result(done) {
+        function execute(done) {
             async.series(tasks,done)
         }
 
-        return result;
+        return execute;
 
     }
 }

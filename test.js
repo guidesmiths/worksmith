@@ -4,7 +4,6 @@ var wfDef = {
     "task": "sequence",
     "items": [
 
-        { task: "set", name:"connection", value: "postgres://postgres:@127.0.0.1/postgres" },
         { task: "map", map: ["@req.params.id", "@req.params.version", "@req.params.type" ], resultTo:"insertParams" },
 
         { task:"sql/pg", connection: "@connection",
@@ -33,6 +32,9 @@ var context = {
             id: Math.random(),
             version:1,
             type:1
+        },
+        config: {
+            connection: "postgres://postgres:@127.0.0.1/postgres"
         }
    }
 }

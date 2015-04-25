@@ -12,12 +12,9 @@ function executeSqlActivity(definition) {
                     debug("Connection error", err)
                     return done(err)
                 }
-                debug("sql connected")
                 function handleResult(err, result) {
                     if (err) return done(err);
                     client.end();
-                    //dbDone();
-                    debug("passing result to chain", typeof result)
                     done(null, result);
                 }
                 var p = params.slice()

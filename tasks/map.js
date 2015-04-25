@@ -2,7 +2,6 @@ var debug = require('debug')('workflow:activities:map')
 
 module.exports = function define(definition) {
     return function build(context) {
-
         return function run(done) {
             var mapDef = context.get(definition.map)
             var result

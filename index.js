@@ -32,14 +32,24 @@ var workflow =  {
         }
 
         function initializeContext(context) {
-            if (!context[Symbol.for("initialized")]) {
+            if (!context.initialized) {
                 context.get = function(name) {
                     return workflow.readValue(name, context)
                 },
                 context.set = function(name, value) {
                     return workflow.setValue(context, name, value)
                 }
+                context.initialized = true;
             }
+        }
+
+        function getArgumentsFromAnnotations(context) {
+            var args = [];
+                WorkflowType.annotations && WorkflowType.annotations.inject &&
+                    WorkflowType.annotations.inject.forEach(function(name) {
+                        args.push(context.get(workflowDefinition[name]))
+                    })
+            return args;
         }
 
         return function build(context) {
@@ -65,18 +75,15 @@ var workflow =  {
                 if (checkCondition(context)) {
                     executed = true;
                     try {
-                        var args = [];
-                        WorkflowType.annotations &&
-                            WorkflowType.annotations.inject &&
-                            WorkflowType.annotations.inject.forEach(function(name) {
-                                args.push(context.get(workflowDefinition[name]))
-                            })
+                        var args = getArgumentsFromAnnotations(context)
 
                         args.push(done)
-console.log("@@@@@@@@@@@@@@", args)
+                        if (process.env.WFDEBUGPARAMS) {
+                            debug("Invocation arguments", args)
+                        }
                         return decorated.apply(this, args);
                     } catch(err) {
-                        throw err;
+                        //throw err;
                         return done(err)
                     }
                 }
