@@ -2,14 +2,12 @@ var debug = require('debug')('workflow:activities:sql:pg')
 var pg = require('pg')
 var _ = require('lodash')
 
+executeSqlActivity.annotations = {inject: ["command", "params", "connection"]}
 function executeSqlActivity(definition) {
     return function(context) {
-        return function(done) {
-            var sqlText = context.get(definition.command),
-                params = context.get(definition.params),
-                cnStr = context.get(definition.connection)
-            console.log(sqlText, params, cnStr)
-            pg.connect(cnStr, function(err, client) {
+        return function(command, params, connection, done) {
+
+            pg.connect(connection, function(err, client) {
                 if (err) {
                     debug("Connection error", err)
                     return done(err)
@@ -19,14 +17,12 @@ function executeSqlActivity(definition) {
                     if (err) return done(err);
                     client.end();
                     //dbDone();
-
                     debug("passing result to chain", typeof result)
                     done(null, result);
                 }
                 var p = params.slice()
-                console.log("@@@@@", p, params)
-                debug("executing sqlText %s ", sqlText, params)
-                client.query(sqlText, p || [], handleResult)
+                debug("executing sql command %s ", command, params)
+                client.query(command, p || [], handleResult)
             });
         }
     }
