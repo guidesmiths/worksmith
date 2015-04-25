@@ -1,5 +1,12 @@
-#mini-workflow 
-Let's you build middleware pipelines from configuration
+#WorkSmith
+
+```npm i worksmith --save```
+
+Let's you build seriously scalable and parallel process definitions - on a clean and slick way.
+
+
+middleware pipelines from configuration
+
 -Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to schedule items
 -Use the conditional property to opt out from wf steps on condition
 -Use "@propertyname" to reference values on the workflow context
@@ -10,13 +17,13 @@ Let's you build middleware pipelines from configuration
 ###The config:
 
 ```JSON
-{ "task": "sequence", 
-  "items": [ 	
-	{"task":"log", "message":"hello there"}, 
+{ "task": "sequence",
+  "items": [
+	{"task":"log", "message":"hello there"},
 	{"task":"delay", "duration":1200},
 	{"task":"set", "new_record": { "Title":"War and peace", "Author":"Leo Tolstoy" }},
-	{"task":"insertDbRecord", 
-	 	"table":"billing_record", 
+	{"task":"insertDbRecord",
+	 	"table":"billing_record",
 	 	"data":"@new_record",
 	 	"connection":"@config.cnString",
 	 	"resultTo":"insert_result"
@@ -29,7 +36,7 @@ Let's you build middleware pipelines from configuration
 ###The code:
 
 ```javascript
-var workflow = require('.src/tasks') 
+var workflow = require('.src/tasks')
 
 var taskDefinition = workflow(require('./config/workflow.json'))
 var context = {config: config, message: message, etc: etc}
@@ -40,10 +47,10 @@ taskDefinition(context)(function(err, result) {
 
 ```
 
-mini-workflow has some core workflow task types for controlling process flow. These are the 
+mini-workflow has some core workflow task types for controlling process flow. These are the
 -sequence
 -parallel
--warezSequence 
+-warezSequence
 activities
 
 ##How to create your own activity
@@ -63,15 +70,15 @@ module.exports = function (node) {
 			console.log("Hello world", utils.readValue(node.inParam, context))
 			utils.setValue(context,"myresult","myvalue")
 			done();
-		}		
+		}
 	}
 
 }
 ```
 Now you can use it the same way as the core activities
 ```javascript
-var wf = workflow.define({ "task": "sequence", 
-  "items": [ 	
+var wf = workflow.define({ "task": "sequence",
+  "items": [
 	{"task":"hello-world", "inParam":"some thing"} ]});
 
 var ctx = {"some":"value"};
@@ -84,17 +91,17 @@ wf(ctx)(function(err) {
 
 ###log
 Write a log to the console
-####options 
+####options
 message
 
 ###delay
 Waits a bit
-####options 
+####options
 duration
 
 ###insertDbRecord
 Like the name suggests
-####options 
+####options
 table
 data
 connection

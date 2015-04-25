@@ -1,4 +1,4 @@
-var debug = require('debug')('workflow:common')
+var debug = require(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    'debug')('workflow:common')
 var _ = require('lodash')
 var path = require('path')
 var hadlebars = require('handlebars')
@@ -9,48 +9,56 @@ var workflow =  {
         return require('./tasks/' + taskType + '.js')
     },
 
+
+
     define: function (workflowDefinition) {
         debug("workflow defining: %s", workflowDefinition.task)
         var task = module.exports.getTaskType(workflowDefinition.task)
         var wfInstance = task(workflowDefinition)
-        //return wfInstance
+
+
+        function checkCondition(context) {
+            if (!("condition" in workflowDefinition)) {
+                return true;
+            }
+            with(context) {
+                var result = eval(workflowDefinition.condition)
+                if (result) {
+                    return true;
+                }
+                return false;
+            }
+
+        }
+
+        function initializeContext(context) {
+            if (!context[Symbol.for("initialized")]) {
+                context.get = function(name) {
+                    return workflow.readValue(name, context)
+                }
+            }
+        }
 
         return function(context) {
-            var decorated = wfInstance(context);
-            var executed = false;
+            var decorated = wfInstance(context)
+            var executed = false
             debug("workflow preparing: %s", workflowDefinition.task)
 
+            initializeContext(context)
 
-
-            return function(done) {
-                //TODO: debug console.log("wrapped wf activity inside");
-                //if ("resultTo" in workflowDefinition) {
+            return function execute(done) {
                 var orig = done,
                 done = function(err, result) {
                     if (executed && workflowDefinition.resultTo) {
-                        utils.setValue(context, workflowDefinition.resultTo, result);
+                        utils.setValue(context, workflowDefinition.resultTo, result)
                     }
                     debug("workflow executed: %s", workflowDefinition.task)
                     orig(err, result);
                 }
-                //}
-
-                function checkCondition() {
-                    if (!("condition" in workflowDefinition)) {
-                        return true;
-                    }
-                    with(context) {
-                        var result = eval(workflowDefinition.condition)
-                        if (result) {
-                            return true;
-                        }
-                        return false;
-                    }
-
-                }
 
                 debug("workflow executing: %s", workflowDefinition.task)
-                if (checkCondition()) {
+
+                if (checkCondition(context)) {
                     executed = true;
                     try {
                         return decorated(done);
