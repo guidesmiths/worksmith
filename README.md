@@ -2,13 +2,12 @@
 
 ```npm i worksmith --save```
 
-Let's you build seriously scalable and parallel process definitions - on a clean and slick way.
+A Seriously functional workflow library.
 
+Compose hyper complex async program parts in ways that is easy to understand and also to maintain, and favors configuration over coding.
 
-middleware pipelines from configuration
-
--Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to schedule items
--Use the conditional property to opt out from wf steps on condition
+-Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to manage program flow
+-Use the conditional property to opt out from workflow steps on condition
 -Use "@propertyname" to reference values on the workflow context
 -Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
 

@@ -3,7 +3,6 @@
 var wfDef = {
     "task": "sequence",
     "items": [
-
         { task: "map", map: ["@req.params.id", "@req.params.version", "@req.params.type" ], resultTo:"insertParams" },
 
         { task:"sql/pg", connection: "@connection",
