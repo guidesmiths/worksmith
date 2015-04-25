@@ -3,9 +3,7 @@
 var wfDef = {
     "task": "sequence",
     "items": [
-        <!-- simulate req in context -->
-        { task: "set", name: "req.params", "value": { id: Math.random().toString(), version:1, type:1 }},
-        <!-- //simulate req in context -->
+
         { task: "set", name:"connection", value: "postgres://postgres:@127.0.0.1/postgres" },
         { task: "map", map: ["@req.params.id", "@req.params.version", "@req.params.type" ], resultTo:"insertParams" },
 
@@ -13,7 +11,7 @@ var wfDef = {
             command:  "insert into billing_record (external_id, version, type) \
                        values ($1, $2, $3) returning id",
             params:  "@insertParams",
-            resultTo: "result"
+            resultTo: "result.rows"
         },
         { task:"sql/pg",
             connection: "@connection",
@@ -29,7 +27,17 @@ var wfDef = {
 
 var def = workflow(wfDef)
 
-var fn = def({ text: "42 hello", a:1, b:"2" });
+var context = {
+    req: {
+        params: {
+            id: Math.random(),
+            version:1,
+            type:1
+        }
+   }
+}
+
+var fn = def(context);
 
 fn(function (err, res) {
     console.log("err", err, "res", res.length)

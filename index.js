@@ -13,8 +13,8 @@ var workflow =  {
 
     define: function (workflowDefinition) {
         debug("workflow defining: %s", workflowDefinition.task)
-        var task = module.exports.getTaskType(workflowDefinition.task)
-        var wfInstance = task(workflowDefinition)
+        var WorkflowType = module.exports.getTaskType(workflowDefinition.task)
+        var wfInstance = WorkflowType(workflowDefinition)
 
 
         function checkCondition(context) {
@@ -65,7 +65,16 @@ var workflow =  {
                 if (checkCondition(context)) {
                     executed = true;
                     try {
-                        return decorated(done);
+                        var args = [];
+                        WorkflowType.annotations &&
+                            WorkflowType.annotations.inject &&
+                            WorkflowType.annotations.inject.forEach(function(name) {
+                                args.push(context.get(workflowDefinition[name]))
+                            })
+
+                        args.push(done)
+console.log("@@@@@@@@@@@@@@", args)
+                        return decorated.apply(this, args);
                     } catch(err) {
                         throw err;
                         return done(err)
@@ -109,7 +118,6 @@ var workflow =  {
     },
 
     setValue: function (object, path, value) {
-        console.log("@@@@@@@@@@setvalue", arguments)
         var parts = path.split('.');
         path = path.replace(/\[/g, ".").replace(/\]/g, "")
         var part;
