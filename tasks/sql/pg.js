@@ -2,10 +2,12 @@ var debug = require('debug')('workflow:activities:sql:pg')
 var pg = require('pg')
 var _ = require('lodash')
 
-executeSqlActivity.annotations = {inject: ["command", "params", "connection"]}
+
 function executeSqlActivity(definition) {
-    return function(context) {
-        return function(command, params, connection, done) {
+    return function build(context) {
+
+        execute.annotations = {inject: ["command", "params", "connection"]};
+        function execute(command, params, connection, done) {
 
             pg.connect(connection, function(err, client) {
                 if (err) {
@@ -22,6 +24,7 @@ function executeSqlActivity(definition) {
                 client.query(command, p || [], handleResult)
             });
         }
+        return execute;
     }
 }
 

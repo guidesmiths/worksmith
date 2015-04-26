@@ -9,13 +9,18 @@ var workflow =  {
         return require('./tasks/' + taskType + '.js')
     },
 
+    getWorkflow: function(task) {
+        if ("string" === typeof task)
+            return workflow.getTaskType(task);
 
+        return task;
+    },
 
     define: function (workflowDefinition) {
         debug("defining: %s", workflowDefinition.task)
-        var WorkflowType = module.exports.getTaskType(workflowDefinition.task)
-        var wfInstance = WorkflowType(workflowDefinition)
+        var WorkflowType = workflow.getWorkflow(workflowDefinition.task)
 
+        var wfInstance = WorkflowType(workflowDefinition)
 
         function checkCondition(context) {
             if (!("condition" in workflowDefinition)) {
@@ -44,12 +49,19 @@ var workflow =  {
 
         }
 
-        function getArgumentsFromAnnotations(context) {
+        function getArgumentsFromAnnotations(context, execute, build) {
             var args = [];
-                WorkflowType.annotations && WorkflowType.annotations.inject &&
-                    WorkflowType.annotations.inject.forEach(function(name) {
-                        args.push(context.get(workflowDefinition[name]))
-                    })
+            //TODO: this line is reallly just interim. annotations should be merged or something
+            var annotations = execute.annotations || build.annotations || WorkflowType.annotations;
+
+             annotations && annotations.inject && annotations.inject.forEach(function(name) {
+                var arg;
+                switch(name[0]) {
+                    case '@': arg = context.get(name); break;
+                    default: arg = context.get(workflowDefinition[name]); break;
+                }
+                args.push(arg)
+            })
             return args;
 
         }
@@ -80,12 +92,12 @@ var workflow =  {
 
                 debug("executing: %s", workflowDefinition.task)
                 try {
-                    var args = getArgumentsFromAnnotations(context)
+                    var args = getArgumentsFromAnnotations(context, decorated, wfInstance)
                     args.push(done)
                     process.env.WSDEBUGPARAMS && debug("...invocation arguments", args)
                     return decorated.apply(this, args);
                 } catch(err) {
-                    //throw err;
+                    throw err;
                     return done(err)
                 }
 

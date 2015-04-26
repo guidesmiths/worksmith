@@ -17,6 +17,7 @@ var context = {
 var wfDef = {
     "task": "sequence",
     "items": [
+        { task:"set", name:"alma", value:"korte"},
         { task: "map", map: ["@req.params.id", "@req.params.version", "@req.params.type" ], resultTo:"insertParams" },
         {
             task:"sql/pg",
@@ -54,7 +55,7 @@ var wfDef = {
 var fn = workflow(wfDef)(context);
 
 fn(function (err, res) {
-    console.log("err", err, "res", res.length)
+    console.log("err", err, "res", context)
 })
 
 // var fn2 = def({text:"Az Oz"});

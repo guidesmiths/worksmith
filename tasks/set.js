@@ -5,14 +5,14 @@ var debug = require('debug')('workflow:activities:set')
 // name="obj1.prop1[1]"
 // value="obj.prop2.prop3"
 
-module.exports = function(node) {
-	return function (context) {
-
-		return function(done) {
-			var value = workflow.readValue(node.value, context)
-			debug("setting value %s as %s", value, node.name);
-			workflow.setValue(context, node.name, value)
-			done();
-		}
-	}
+setActivity.annotations = {inject: ["name","value"]}
+function setActivity(node) {
+    return function (context) {
+        return function(name, value, done) {
+            debug("setting value %s as %s", value, node.name)
+            context.set(name, value)
+            done();
+        }
+    }
 }
+module.exports = setActivity
