@@ -9,7 +9,6 @@ describe("WorkSmith setActivity", function() {
         var wi = workflow({ "task":"set", "name":"field", "value":"value" })(context);
 
         wi(function(err, result) {
-            console.log("@#@#@#@#");
             assert.equal(context.field, "value", "context field  must be set")
             done();
         })
@@ -20,7 +19,6 @@ describe("WorkSmith setActivity", function() {
         var wi = workflow({ "task":"set", "name":"field2", "value":"@field1" })(context);
 
         wi(function(err, result) {
-            console.log("@#@#@#@#");
             assert.equal(context.field2, "value1", "context field  must be set")
             done();
         })

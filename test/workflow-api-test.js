@@ -79,6 +79,27 @@ describe("WorkSmith API", function() {
         })
     })
 
+    it("should handle 'resultTo' pipeline", function(done) {
+        var def = {
+            task: function(def) {
+                return function build(context) {
+                    return function execute(done) {
+                        done(null, 42);
+                    }
+                }
+            },
+            resultTo:"result"
+        };
+        var wf = workflow(def)
+        var context = {};
+        var wi = wf(context);
+        wi(function(err, res) {
+            assert.equal(context.result,42, "result must be passed correctly")
+            done();
+        })
+
+    })
+
     describe("parameter injector", function() {
       it("should inject definition fields correctly - static value", function(done) {
         var flags = {};
