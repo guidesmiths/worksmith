@@ -12,7 +12,7 @@ var workflow =  {
 
 
     define: function (workflowDefinition) {
-        debug("workflow defining: %s", workflowDefinition.task)
+        debug("defining: %s", workflowDefinition.task)
         var WorkflowType = module.exports.getTaskType(workflowDefinition.task)
         var wfInstance = WorkflowType(workflowDefinition)
 
@@ -41,6 +41,7 @@ var workflow =  {
                 }
                 context.initialized = true;
             }
+
         }
 
         function getArgumentsFromAnnotations(context) {
@@ -50,45 +51,44 @@ var workflow =  {
                         args.push(context.get(workflowDefinition[name]))
                     })
             return args;
+
         }
 
         return function build(context) {
             var decorated = wfInstance(context)
-            var executed = false
-            debug("workflow preparing: %s", workflowDefinition.task)
+            debug("preparing: %s", workflowDefinition.task)
 
             initializeContext(context)
 
             return function execute(done) {
+
+
+                if (!checkCondition())
+                    return done()
+
                 var orig = done,
                 done = function(err, result) {
-                    debug("workflow completed, result is", typeof result)
-                    if (executed && workflowDefinition.resultTo) {
+                    debug("completed")
+                    if (workflowDefinition.resultTo) {
+                        process.env.WSDEBUGPARAMS && debug("...result is", result)
                         workflow.setValue(context, workflowDefinition.resultTo, result)
                     }
-                    debug("workflow executed: %s", workflowDefinition.task)
+                    debug("executed: %s", workflowDefinition.task)
                     orig(err, result);
                 }
 
-                debug("workflow executing: %s", workflowDefinition.task)
 
-                if (checkCondition(context)) {
-                    executed = true;
-                    try {
-                        var args = getArgumentsFromAnnotations(context)
-
-                        args.push(done)
-                        if (process.env.WFDEBUGPARAMS) {
-                            debug("Invocation arguments", args)
-                        }
-                        return decorated.apply(this, args);
-                    } catch(err) {
-                        //throw err;
-                        return done(err)
-                    }
+                debug("executing: %s", workflowDefinition.task)
+                try {
+                    var args = getArgumentsFromAnnotations(context)
+                    args.push(done)
+                    process.env.WSDEBUGPARAMS && debug("...invocation arguments", args)
+                    return decorated.apply(this, args);
+                } catch(err) {
+                    //throw err;
+                    return done(err)
                 }
 
-                done();
             }
         }
     },
