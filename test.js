@@ -18,23 +18,21 @@ var wfDef = {
     "task": "sequence",
     "items": [
         { task: "map", map: ["@req.params.id", "@req.params.version", "@req.params.type" ], resultTo:"insertParams" },
-
         {
-            task:"sql/pg", connection: "@config.connection",
+            task:"sql/pg",
+            connection: "@config.connection",
             command:  "insert into billing_record (external_id, version, type) \
                        values ($1, $2, $3) returning id",
             params:  "@insertParams",
             resultTo: "insertResult"
         },
         {
-            task:"log", message: {template: "Total inserted items: {{insertResult.rowCount}}" }
-        },
-        {
             task:"code",
-            execute: function (newRecord, re, done) {
+            inject:["@insertResult.rows[0]"],
+            execute: function (newRecord, done) {
+                console.log("@@@new record is", newRecord)
                 done(null, "alma")
             },
-            inject:["insertResult.rows[0]","insertResult"],
             resultTo: "convertedSomething"
         },
         {

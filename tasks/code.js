@@ -5,12 +5,13 @@ var workflow = require('../')
 
 codeActivity.annotations = {inject: ["execute","inject"]}
 function codeActivity(definition) {
+
     return function(context) {
         return function(execute, inject, done) {
             var args = [];
-            if (Array.isArray(inject)) {
+            if (execute.length > 1 && Array.isArray(inject)) {
                 inject.forEach(function(name) {
-                    args.push(context.get("@" + name))
+                    args.push(context.get(name))
                 })
             }
             args.push(done)
@@ -18,5 +19,7 @@ function codeActivity(definition) {
         }
     }
 }
+
+
 
 module.exports = codeActivity
