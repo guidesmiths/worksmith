@@ -39,7 +39,7 @@ describe("WorkSmith API", function() {
             task: function(def) {
                 flags.definition = def;
                 return function build(context) {
-                    return function execute(done) {
+                    return func;ction execute(done) {
                         done();
                     }
                 }

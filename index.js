@@ -2,10 +2,18 @@ var debug = require(                                                            
 var _ = require('lodash')
 var path = require('path')
 var handlebars = require('handlebars')
+var fs = require('fs')
+
+
+// var p = process.cwd() + "/tasks/log.js";
+// var r = require(p);
+// console.log(r);
+//var lloo = module.parent.require('foobar/lloogg')
 
 var workflow =  {
 
     getTaskType: function(taskType) {
+        //var p = process.cwd() + "/tasks/" + taskType + ".js";
         return require('./tasks/' + taskType + '.js')
     },
 

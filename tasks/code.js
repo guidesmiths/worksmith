@@ -3,11 +3,12 @@ var pg = require('pg')
 var _ = require('lodash')
 var workflow = require('../')
 
-codeActivity.annotations = {inject: ["execute","inject"]}
+
 function codeActivity(definition) {
 
     return function(context) {
-        return function(execute, inject, done) {
+        execute.annotations = {inject: ["execute","inject"]}
+        function execute(execute, inject, done) {
             var args = [];
             if (execute.length > 1 && Array.isArray(inject)) {
                 inject.forEach(function(name) {
@@ -17,6 +18,7 @@ function codeActivity(definition) {
             args.push(done)
             execute.apply(this, args)
         }
+        return execute;
     }
 }
 
