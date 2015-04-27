@@ -4,16 +4,16 @@
 
 A Seriously functional workflow library.
 
-Compose hyper complex async program parts in ways that is easy to understand and also to maintain, and favors configuration over coding.
+Compose hyper complex async program parts in a way that is easy to understand and also to maintain, and favors configuration over coding.
 
--Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to manage program flow
--Use the conditional property to opt out from workflow steps on condition
--Use "@propertyname" to reference values on the workflow context
--Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
+- Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to manage program flow
+- Use the conditional property to opt out from workflow steps on condition
+- Use "@propertyname" to reference values on the workflow context
+- Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
 
 ##usage
 
-###The config:
+###The workflow definition:
 
 ```JSON
 { "task": "sequence",
