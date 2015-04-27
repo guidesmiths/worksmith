@@ -15,7 +15,7 @@ Compose hyper complex async program parts in a way that is easy to understand an
 
 ###The workflow definition:
 
-```JSON
+```javascript
 { "task": "sequence",
   "items": [
         {
@@ -25,7 +25,7 @@ Compose hyper complex async program parts in a way that is easy to understand an
         },
         {
             task:"sql/pg",
-            connection: "@config.connection",
+            connection: "@connection",
             command:  "insert into order (order_id, version, type) \
                        values ($1, $2, $3) returning id",
             params:  "@insertParams",
@@ -42,9 +42,10 @@ Compose hyper complex async program parts in a way that is easy to understand an
 
 var worksmith = require('worksmith')
 
+
 var Workflow = worksmith('./workflow.json')
 
-var context = {req: req, myapi: foobar, etc: etc}
+var context = {connection:"postgres://login:pw@host/db", other:"data"}
 
 var task = Workflow(context);
 
