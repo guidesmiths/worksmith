@@ -41,6 +41,7 @@ var wfDef = {
             message:"@convertedSomething"
         },
         { task:"sql/pg",
+            condition:"false",
             connection: "@config.connection",
             command:  "select * from billing_record where  \
                         external_id = ($1) and version = ($2) and type = ($3)",

@@ -1,9 +1,6 @@
 var hb = require('handlebars')
 var workflow = require('../')
 var debug = require('debug')('workflow:activities:set')
-// example
-// name="obj1.prop1[1]"
-// value="obj.prop2.prop3"
 
 setActivity.annotations = {inject: ["name","value"]}
 function setActivity(node) {

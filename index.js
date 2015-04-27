@@ -4,23 +4,23 @@ var path = require('path')
 var handlebars = require('handlebars')
 var fs = require('fs')
 
-
-// var p = process.cwd() + "/tasks/log.js";
-// var r = require(p);
-// console.log(r);
-//var lloo = module.parent.require('foobar/lloogg')
+var taskTypeCache = {};
 
 var workflow =  {
 
+    discoverTaskType: function(taskType) {
+        var processRelativePath = path.join(process.cwd(), "/src/tasks/", taskType + ".js");
+        return fs.existsSync(processRelativePath) ? processRelativePath : "./tasks/" + taskType + ".js";
+    },
+
     getTaskType: function(taskType) {
-        //var p = process.cwd() + "/tasks/" + taskType + ".js";
-        return require('./tasks/' + taskType + '.js')
+        var taskFile = taskTypeCache[taskType] || (taskTypeCache[taskType] = workflow.discoverTaskType(taskType))
+        return require(taskFile);
     },
 
     getWorkflow: function(task) {
         if ("string" === typeof task)
             return workflow.getTaskType(task);
-
         return task;
     },
 
@@ -83,7 +83,7 @@ var workflow =  {
             return function execute(done) {
 
 
-                if (!checkCondition())
+                if (!checkCondition(context))
                     return done()
 
                 var orig = done,
@@ -153,8 +153,86 @@ var workflow =  {
                 object[part] = object[part] || {};
                 object = object[part];
             } else {
-
+                //TODO:
                 var mapDef = value
+
+                object[part] = value;
+            }
+        }
+    }
+
+
+}
+
+function wfLoader(wf) {
+    if ("string" === typeof wf) {
+        wf = path.relative(__dirname, path.resolve(wf))
+        debug("loading workflow file: %s", wf)
+        wf = require(wf);
+    }
+    return workflow.define(wf);
+}
+_.extend(wfLoader, workflow);
+
+module.exports = wfLoader;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 // var result
                 // var builders = {
@@ -176,22 +254,3 @@ var workflow =  {
                 // value = (builders[Object.prototype.toString.call(mapDef)] || (function(o) { return o })) (mapDef)
 
 
-                object[part] = value;
-            }
-        }
-    }
-
-
-}
-
-function wfLoader(wf) {
-    if ("string" === typeof wf) {
-        wf = path.relative(__dirname, path.resolve(wf))
-        debug("loading workflow file: %s", wf)
-        wf = require(wf);
-    }
-    return workflow.define(wf);
-}
-_.extend(wfLoader, workflow);
-
-module.exports = wfLoader;

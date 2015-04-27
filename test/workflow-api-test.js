@@ -100,6 +100,7 @@ describe("WorkSmith API", function() {
 
     })
 
+
     describe("parameter injector", function() {
       it("should inject definition fields correctly - static value", function(done) {
         var flags = {};

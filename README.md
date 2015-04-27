@@ -18,16 +18,19 @@ Compose hyper complex async program parts in a way that is easy to understand an
 ```JSON
 { "task": "sequence",
   "items": [
-	{"task":"log", "message":"hello there"},
-	{"task":"delay", "duration":1200},
-	{"task":"set", "new_record": { "Title":"War and peace", "Author":"Leo Tolstoy" }},
-	{"task":"insertDbRecord",
-	 	"table":"billing_record",
-	 	"data":"@new_record",
-	 	"connection":"@config.cnString",
-	 	"resultTo":"insert_result"
-	},
-	{ "task":"log", "message":"@insert_result.rows"}
+        {
+            task: "set",
+            value: ["some_id", 1, 1]
+        },
+        {
+            task:"sql/pg",
+            connection: "@config.connection",
+            command:  "insert into order (order_id, version, type) \
+                       values ($1, $2, $3) returning id",
+            params:  "@insertParams",
+            resultTo: "insertResult"
+        },
+        {...}
   ]
 }
 ```
@@ -35,15 +38,18 @@ Compose hyper complex async program parts in a way that is easy to understand an
 ###The code:
 
 ```javascript
-var workflow = require('.src/tasks')
 
-var taskDefinition = workflow(require('./config/workflow.json'))
-var context = {config: config, message: message, etc: etc}
+var worksmith = require('worksmith')
 
-taskDefinition(context)(function(err, result) {
-		console.log("wf completed")
+var Workflow = worksmith('./workflow.json')
+
+var context = {req: req, myapi: foobar, etc: etc}
+
+var task = Workflow(context);
+
+task(function(err, result) {
+    console.log("workflow completed, context potentially changed")
 })
-
 ```
 
 mini-workflow has some core workflow task types for controlling process flow. These are the
@@ -60,17 +66,17 @@ Place the following code as ```"hello-world.js"``` in the ```tasks``` folder
 ```javascript
 var utils = require('./utils.js')
 module.exports = function (node) {
-	//use the node variable to access workflow params
-	return function(context) {
-	//use the context to access workflow execution state
-		return function(done) {
-		//set done when your acitivity finished its job
-		//read and write data from the context
-			console.log("Hello world", utils.readValue(node.inParam, context))
-			utils.setValue(context,"myresult","myvalue")
-			done();
-		}
-	}
+    //use the node variable to access workflow params
+    return function(context) {
+    //use the context to access workflow execution state
+        return function(done) {
+        //set done when your acitivity finished its job
+        //read and write data from the context
+            console.log("Hello world", utils.readValue(node.inParam, context))
+            utils.setValue(context,"myresult","myvalue")
+            done();
+        }
+    }
 
 }
 ```
@@ -78,11 +84,11 @@ Now you can use it the same way as the core activities
 ```javascript
 var wf = workflow.define({ "task": "sequence",
   "items": [
-	{"task":"hello-world", "inParam":"some thing"} ]});
+    {"task":"hello-world", "inParam":"some thing"} ]});
 
 var ctx = {"some":"value"};
 wf(ctx)(function(err) {
-	console.log(ctx)
+    console.log(ctx)
 })
 ```
 
