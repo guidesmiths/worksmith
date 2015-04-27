@@ -2,7 +2,7 @@
 
 ```npm i worksmith --save```
 
-A Seriously functional workflow library.
+A seriously ```functional``` workflow library.
 
 Compose hyper complex async program parts in a way that is easy to understand and also to maintain, and favors configuration over coding.
 
@@ -20,7 +20,8 @@ Compose hyper complex async program parts in a way that is easy to understand an
   "items": [
         {
             task: "set",
-            value: ["some_id", 1, 1]
+            value: ["some_id", 1, 1],
+            resultTo: "@insertParams"
         },
         {
             task:"sql/pg",
@@ -64,7 +65,7 @@ mini-workflow lets you build your activities on a super easy way
 Place the following code as ```"hello-world.js"``` in the ```tasks``` folder
 
 ```javascript
-var utils = require('./utils.js')
+var utils = require('worksmith')
 module.exports = function (node) {
     //use the node variable to access workflow params
     return function(context) {
