@@ -1,4 +1,4 @@
-#WorkSmith
+# WorkSmith
 
 ```npm i worksmith --save```
 
@@ -11,9 +11,9 @@ Compose hyper complex async program parts in a way that is easy to understand an
 - Use "@propertyname" to reference values on the workflow context
 - Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
 
-##usage
+## usage
 
-###The workflow definition:
+### The workflow definition:
 
 ```javascript
 { "task": "sequence",
@@ -36,7 +36,7 @@ Compose hyper complex async program parts in a way that is easy to understand an
 }
 ```
 
-###The code:
+### The code:
 
 ```javascript
 
@@ -60,7 +60,7 @@ mini-workflow has some core workflow task types for controlling process flow. Th
 -warezSequence
 activities
 
-##How to create your own activity
+## How to create your own activity
 
 mini-workflow lets you build your activities on a super easy way
 Place the following code as ```"hello-world.js"``` in the ```tasks``` folder
@@ -94,49 +94,49 @@ wf(ctx)(function(err) {
 })
 ```
 
-##List of core activities
+## List of core activities
 
-###log
+### log
 Write a log to the console
-####options
+#### options
 message
 
-###delay
+### delay
 Waits a bit
-####options
+#### options
 duration
 
-###insertDbRecord
+### insertDbRecord
 Like the name suggests
-####options
+#### options
 table
 data
 connection
 resultTo
 
-###softDeleteDbRecord
+### softDeleteDbRecord
 
-###deleteDbRecord
+### deleteDbRecord
 
-###parallel
+### parallel
 Execute sub tasks in parallel
-####options
+#### options
 items array
 
-###sequence
+### sequence
 Execute sub tasks in sequence
-####options
+#### options
 items array
 
-###warezSequence
+### warezSequence
 Define a sequence on a patching compatible way
-####options
+#### options
 items array
 
 
-###set
+### set
 Set variable on the workflow context
-####options
+#### options
 name
 value
 

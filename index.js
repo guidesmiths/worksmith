@@ -88,6 +88,9 @@ var workflow =  {
 
                 var orig = done,
                 done = function(err, result) {
+                    if (err) {
+                        console.error("Error in WF %s", workflowDefinition.task, err.message)
+                    }
                     debug("completed")
                     if (workflowDefinition.resultTo) {
                         process.env.WSDEBUGPARAMS && debug("...result is", result)
