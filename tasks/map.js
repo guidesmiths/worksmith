@@ -1,6 +1,14 @@
 var debug = require('debug')('workflow:activities:map')
 
 module.exports = function define(definition) {
+
+    Object.keys(definition).forEach(function(key) {
+        if (key[0] === ">") {
+            definition.map = definition[key];
+            definition.resultTo = key.slice(1);
+            delete definition[key]
+        }
+    });
     return function build(context) {
         return function run(done) {
             var mapDef = context.get(definition.map)
