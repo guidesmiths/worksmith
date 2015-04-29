@@ -92,6 +92,7 @@ var workflow =  {
                         if (!err.supressMessage) {
                             console.error("Error in WF <%s>, error is:<%s> ", workflowDefinition.task, err.message || err)
                         }
+                        return orig(err)
                     }
                     debug("completed")
                     if (workflowDefinition.resultTo) {
