@@ -1,6 +1,6 @@
 {
   "name": "worksmith",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A purely functional workflow engine ",
   "main": "index.js",
   "scripts": {
