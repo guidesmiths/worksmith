@@ -61,8 +61,9 @@ var workflow =  {
             var args = [];
             //TODO: this line is reallly just interim. annotations should be merged or something
             var annotations = execute.annotations || build.annotations || WorkflowType.annotations;
-
-             annotations && annotations.inject && annotations.inject.forEach(function(name) {
+            annotations = annotations || {};
+            execute.inject && (annotations.inject = execute.inject);
+            annotations.inject && annotations.inject.forEach(function(name) {
                 var arg;
                 switch(name[0]) {
                     case '@': arg = context.get(name); break;

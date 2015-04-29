@@ -157,4 +157,32 @@ describe("WorkSmith API", function() {
         })
       })
     })
+
+    it("should handle inject shortcut ", function(done) {
+        var flags = {};
+
+        var def = {
+
+            task: function(def) {
+                function build(context) {
+                    function execute(param1, done) {
+                        flags.param1 = param1;
+                        done();
+                    }
+                    execute.inject = ["@field1"]
+                    return execute
+                }
+                return build
+            }
+        };
+
+        var wf = workflow(def)
+        var context = { field1:"value1" };
+        var wi = wf(context);
+        wi(function(err, res) {
+            assert.equal(flags.param1,"value1", "injected must be passed correctly")
+            done();
+        })
+    })
+
 })
