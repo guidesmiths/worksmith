@@ -25,6 +25,7 @@ var workflow =  {
     },
 
     define: function (workflowDefinition) {
+
         debug("defining: %s", workflowDefinition.task)
         var WorkflowType = workflow.getWorkflow(workflowDefinition.task)
 
@@ -76,6 +77,9 @@ var workflow =  {
         }
 
         return function build(context) {
+            if (arguments.length == 2) {
+                return build(arguments[0])(arguments[1])
+            }
             var decorated = wfInstance(context)
             debug("preparing: %s", workflowDefinition.task)
 

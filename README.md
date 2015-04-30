@@ -2,7 +2,7 @@
 
 ```npm i worksmith --save```
 
-A seriously ```functional``` workflow library, that lets you build composable process definitions for various reasons.
+A seriously ```functional``` workflow library, that lets you build composable and configurable process definitions for various reasons.
 
 
 ## Highlights
@@ -10,23 +10,23 @@ A seriously ```functional``` workflow library, that lets you build composable pr
   - Control flow:  ```sequence``` ,  ```parallel``` and ```warezSequence```
   - IO: ```log```,```sql/pg```
   - Tansformation: ```map```, ```regex```, ```set```
-  - Extensibitly: ```code``` task type
+  - Extensibitly: ```code``` task type, create custom task types by creating files in the tasks folder
 
-- Use the conditional property to opt out from workflow steps on condition
-- Use "@propertyname" to reference values on the workflow context
-- Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
-
+- with WorkSmith you can build a complex async process chain from functional steps (tasks) - yet keep the application easy to understand and each functional step easy to developer and maintain. forget ```if(err) return next(err)```
+- workflow steps are unaware about each other - they communicate over a shared context. WorkSmith provides an intuitive expression syntax for working with the context in a workflow definitions
 ## usage
 
-### The workflow definition:
+### A workflow definition:
 
 ```javascript
 { "task": "sequence",
   "items": [
         {
-            task: "set",
-            value: ["some_id", 1, 1],
-            resultTo: "@insertParams"
+            task:"log", message:"hello workflow"
+        },
+        {
+            task: "map",
+            ">insertParams": ["@req.params.id", 1, 1]
         },
         {
             task:"sql/pg",
@@ -47,27 +47,24 @@ A seriously ```functional``` workflow library, that lets you build composable pr
 
 var worksmith = require('worksmith')
 
+var workflow = worksmith('./workflow.json')
 
-var Workflow = worksmith('./workflow.json')
 
-var context = {connection:"postgres://login:pw@host/db", other:"data"}
+var context = {
+    connection:"postgres://login:pw@host/db",
+    other:"data"
+}
 
-var task = Workflow(context);
-
-task(function(err, result) {
-    console.log("workflow completed, context potentially changed")
+workflow(context, function(err, result) {
+    console.log("workflow completed, %", context.insertResult)
 })
-```
 
-mini-workflow has some core workflow task types for controlling process flow. These are the
--sequence
--parallel
--warezSequence
-activities
+
+```
 
 ## How to create your own activity
 
-mini-workflow lets you build your activities on a super easy way
+WorkSmith lets you build your activities on a super easy way
 Place the following code as ```"hello-world.js"``` in the ```tasks``` folder
 
 ```javascript
@@ -79,8 +76,8 @@ module.exports = function (node) {
         return function(done) {
         //set done when your acitivity finished its job
         //read and write data from the context
-            console.log("Hello world", utils.readValue(node.inParam, context))
-            utils.setValue(context,"myresult","myvalue")
+            console.log("Hello world", context.get(node.inParam))
+            context.set("myresult","myvalue")
             done();
         }
     }
@@ -89,12 +86,10 @@ module.exports = function (node) {
 ```
 Now you can use it the same way as the core activities
 ```javascript
-var wf = workflow.define({ "task": "sequence",
-  "items": [
-    {"task":"hello-world", "inParam":"some thing"} ]});
+var wf = workflow( {"task":"hello-world", "inParam":"some thing"} );
 
 var ctx = {"some":"value"};
-wf(ctx)(function(err) {
+wf(ctx, function(err) {
     console.log(ctx)
 })
 ```

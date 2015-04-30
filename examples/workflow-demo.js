@@ -20,8 +20,7 @@ var taskDefinition = workflow.define(
 });
 
 var ctx = {}
-var task = taskDefinition(ctx);
-task(function(err, result) {
+var task = taskDefinition(ctx, function(err, result) {
     console.log("executed", ctx);
 });
 
