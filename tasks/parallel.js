@@ -1,5 +1,5 @@
 var async = require('async')
-var workflow = require('./')
+var workflow = require('../')
 
 module.exports = function(node) {
 	return function(context) {

@@ -2,11 +2,16 @@
 
 ```npm i worksmith --save```
 
-A seriously ```functional``` workflow library.
+A seriously ```functional``` workflow library, that lets you build composable process definitions for various reasons.
 
-Compose hyper complex async program parts in a way that is easy to understand and also to maintain, and favors configuration over coding.
 
-- Use prebuilt activites like ```sequence``` or ```parallel``` or the ```warezSequence``` to manage program flow
+## Highlights
+- WorkSmith comes with an extensible task library
+  - Control flow:  ```sequence``` ,  ```parallel``` and ```warezSequence```
+  - IO: ```log```,```sql/pg```
+  - Tansformation: ```map```, ```regex```, ```set```
+  - Extensibitly: ```code``` task type
+
 - Use the conditional property to opt out from workflow steps on condition
 - Use "@propertyname" to reference values on the workflow context
 - Use {template: "{{xy}}/{{asd}}" to access the context with a templating engine
