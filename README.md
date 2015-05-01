@@ -1,4 +1,4 @@
-# WorkSmith
+# worksmith
 
 ```npm i worksmith --save```
 
@@ -6,17 +6,18 @@ A seriously ```functional``` workflow library, that lets you build composable an
 
 
 ## Highlights
-- WorkSmith comes with an extensible task library
+- worksmith comes with an extensible task library
   - Control flow:  ```sequence``` ,  ```parallel``` and ```warezSequence```
   - IO: ```log```,```sql/pg```
   - Tansformation: ```map```, ```regex```, ```set```
-  - Extensibitly: ```code``` task type, create custom task types by creating files in the tasks folder
+  - Extensibitly: ```code``` activity , create custom task types by creating files in the tasks folder
 
-- with WorkSmith you can build a complex async process chain from functional steps (tasks) - yet keep the application easy to understand and each functional step easy to developer and maintain. forget ```if(err) return next(err)```
+- with worksmith you can build a complex async process chain from functional steps (tasks) - yet keep the application easy to understand and each functional step easy to developer and maintain. forget ```if(err) return next(err)```
 - workflow steps are unaware about each other - they communicate over a shared context. WorkSmith provides an intuitive expression syntax for working with the context in a workflow definitions
 ## usage
 
 ### A workflow definition:
+This can be in a config file, or as part of your js code as a variable.
 
 ```javascript
 { "task": "sequence",
@@ -64,7 +65,7 @@ workflow(context, function(err, result) {
 
 ## How to create your own activity
 
-WorkSmith lets you build your activities on a super easy way
+worksmith lets you build your activities on a super easy way
 Place the following code as ```"hello-world.js"``` in the ```tasks``` folder
 
 ```javascript
