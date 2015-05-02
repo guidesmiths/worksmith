@@ -3,6 +3,7 @@ var xregexp = require('xregexp')
 var XRegExp = xregexp.XRegExp
 
 module.exports = function (node) {
+    //for performance considerations the regex pattern should be constructed w/o using context variables
     var p = XRegExp(node.pattern,'x');
 
     return function(context) {

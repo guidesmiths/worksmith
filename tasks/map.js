@@ -2,6 +2,7 @@ var debug = require('debug')('workflow:activities:map')
 
 module.exports = function define(definition) {
 
+    //TODO: refactor and place this to wf creator level
     Object.keys(definition).forEach(function(key) {
         if (key[0] === ">") {
             definition.map = definition[key];
