@@ -1,7 +1,4 @@
-var debug = require('debug')('workflow:activities:sql:pg')
-var pg = require('pg')
-var _ = require('lodash')
-var workflow = require('../')
+var debug = require('debug')('workflow:activities:code')
 
 
 function codeActivity(definition) {
