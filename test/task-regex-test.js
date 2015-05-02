@@ -39,4 +39,22 @@ describe("regexActivity", function () {
         })
     })
 
+    it("should provide resultTo shortcut", function (done) {
+        var context = { "stringToChop": "how-much-wood" };
+        var flag;
+        
+        var wi = workflow({
+            "task": "regex", 
+            "pattern": "(?<part1>[^.]*)-(?<part2>[^.]*)-(?<part3>[^.]*)",
+            ">result": "@stringToChop",
+        })(context);
+        
+        wi(function (err, result) {
+            assert.equal(context.result.part1, "how", "regex field must match")
+            assert.equal(context.result.part2, "much", "regex field must match")
+            done();
+        })
+    })
+
+
 })
