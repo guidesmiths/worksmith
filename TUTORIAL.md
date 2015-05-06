@@ -13,12 +13,25 @@ workflow({}, function(err, res) {
     console.log("workflow executed")
 })
 ```
+## workflow as a json
+You can also store your workflow definition in a separater file.
+```json
+{ 
+    "task":"log",
+    "message":"hello"
+}
+
+```javascript
+var workflow = require('worksmith')('./definition.js')
+workflow({}, function(err, res) {
+    console.log("workflow executed")
+})
+```
+
 
 ## The workflow context
-Workflow steps communicate with the world using the workflow context, a shared state between individual tasks. Tasks can reference values from this shared context
-via their parameters.
-
-Referencing the workflow context in the workflow definition is done by using '@' as the first charact when assigning values to task parameters.
+Workflow steps communicate with the world using the workflow context, a shared state between individual tasks. 
+Tasks can reference values from this shared context via their parameters using '@' as the first character in parameter values.
 
 ```javascript
 var worksmith = require('worksmith')
