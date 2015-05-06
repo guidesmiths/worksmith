@@ -20,7 +20,7 @@ You can also store your workflow definition in a separater file.
     "task":"log",
     "message":"hello"
 }
-
+```
 ```javascript
 var workflow = require('worksmith')('./definition.js')
 workflow({}, function(err, res) {
