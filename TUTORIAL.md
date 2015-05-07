@@ -176,7 +176,7 @@ var workflow = worksmith({
 ```
 
 ## Errors in a workflow
-To sign error in a workflow simply set value for the error argument in the done() callback.
+To signal error in a workflow simply set value for the error argument in the done() callback.
 No subsequent tasks will be executed.
 
 ```javascript
