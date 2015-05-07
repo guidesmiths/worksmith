@@ -99,7 +99,7 @@ To create a smarter logger activity place a file named `log.js` in your tasks fo
 ```javascript
 module.exports = function define(params) {
     //params will contain the tasks json config eg
-    // {task:"job2", message:"@p1", "level":"warn"}
+    // {task:"job", message:"@p1", "level":"warn"}
     return function(context) {
         //context will hold the execution state e.g.
         //{p1:"hello"}
