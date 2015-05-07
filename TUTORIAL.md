@@ -70,7 +70,7 @@ workflow({p1:"answer", p2:42}, function(err, res) {
 ```
 
 ## Task results and the `map` activity
-Tasks may have a "return value" - a result that other workflow step that come later can access.
+Tasks may have a "return value" - a result that other workflow steps that come later can access.
 The context is there to store this return value, if you specify a context field name in the `resultTo` task parameter.
 
 The `map` activity lets you produce a new value on the context based on existing context values - or workflow service method results.
@@ -146,3 +146,51 @@ module.exports = function define(params) {
     }   
 }
 ```
+## Returning values
+To set the value for the field name specified in `resultTo` just provide data for the done() handler.
+`src/resulter.js`
+```javascript
+module.exports = function define(params) {
+
+    return function(context) {
+
+       function execute(done) {
+           
+            setTimeout(function() {  //async process
+                done(undefined, {some:"value"})
+            }, 100);
+
+        }
+        return execute
+    }   
+}
+```
+```
+var workflow = worksmith({ 
+    task:"sequence", 
+    items: [
+        {  task:"resulter", resultTo:"result" },
+        { task:"log", message:"@result" }
+    ]
+});
+```
+
+## Errors in a workflow
+To sign error in a workflow simply set value for the error argument in the done() callback.
+No subsequent tasks will be executed.
+
+```javascript
+module.exports = function define(params) {
+
+    return function(context) {
+
+       function execute(msg, lvl, done) {
+           
+            setTimeout(function() {  //async process
+                done(new Error("something"))
+            }, 100);
+
+        }
+        return execute
+    }   
+}
