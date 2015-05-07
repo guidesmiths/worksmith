@@ -129,7 +129,7 @@ workflow({p1:"answer"}, function(err, res) {
 ## Getting task params injected
 Use injection rather then context.get - because 1) it is more sexy, 2) it will support async injection of params in remote workflows
 
-`src/log.js`
+`src/tasks/log.js`
 ```javascript
 module.exports = function define(params) {
     //params will contain the tasks json config eg
