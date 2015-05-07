@@ -95,7 +95,7 @@ workflow({p1:"answer", p2:42}, function(err, res) {
 Tasks are referenced by their names in workflow definitions and are looked up in the `~/src/tasks` folder of your application.
 To create a smarter logger activity place a file named `log.js` in your tasks folder. With this you override the default log activity.
 
-`src/log.js`
+`src/tasks/log.js`
 ```javascript
 module.exports = function define(params) {
     //params will contain the tasks json config eg
