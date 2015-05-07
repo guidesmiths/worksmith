@@ -184,7 +184,7 @@ module.exports = function define(params) {
 
     return function(context) {
 
-       function execute(msg, lvl, done) {
+       function execute(done) {
            
             setTimeout(function() {  //async process
                 done(new Error("something"))
