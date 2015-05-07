@@ -3,8 +3,9 @@ var worksmith = require('..')
 var workflow = worksmith({ 
     task:"sequence", 
     items: [
-        { task:"log", message:"@p1" },
-        { task:"log", message:"@p2" }
+        {  task:"map", map: { f1:"@p1", f2:"@p2" }, resultTo:"mapData.d1" },
+        {  task:"map", ">mapData.d2": ["@p1","Hello"] },
+        { task:"log", message:"@mapData" }
     ]
 });
 

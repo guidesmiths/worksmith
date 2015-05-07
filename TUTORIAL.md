@@ -1,7 +1,6 @@
 # worksmith tutorial
-Your definitive guide to build worksmith workflows
 
-
+## npm install --save worksmith
 
 ## The hello world workflow
 One of the simplest activities in worksmith is the `logActivity` that outputs its message to the JavaScript console.
@@ -75,13 +74,15 @@ Tasks may have a "return value" - a result that other workflow step that come la
 The context is there to store this return value, if you specify a context field name in the `resultTo` task parameter.
 
 The `map` activity lets you produce a new value on the context based on existing context values - or workflow service method results.
+It also supports the `>` resultTo shortcut in the place of the map parameter
 
 ```javascript
 var workflow = worksmith({ 
     task:"sequence", 
     items: [
-        {  task:"map", map: { f1:"@p1", f2:"@p2" }, resultTo:"mapResult" },
-        { task:"log", message:"@mapResult" }
+        {  task:"map", map: { f1:"@p1", f2:"@p2" }, resultTo:"mapData.d1" },
+        {  task:"map", ">mapData.d2": ["@p1","Hello"] },
+        { task:"log", message:"@mapData.d2[1]" }
     ]
 });
 
@@ -90,4 +91,58 @@ workflow({p1:"answer", p2:42}, function(err, res) {
 })
 ```
 
-. 
+## How to create a custom task type (activity)
+Tasks are referenced by their names in workflow definitions and are looked up in the `~/src/tasks` folder of your application.
+To create a smarter logger activity place a file named `log.js` in your tasks folder. With this you override the default log activity.
+
+`src/log.js`
+```javascript
+module.exports = function define(params) {
+    //params will contain the tasks json config eg
+    // {task:"job2", message:"@p1", "level":"warn"}
+    return function(context) {
+        //context will hold the execution state e.g.
+        //{p1:"hello"}
+        return function(done) {
+            console[context.get(params.level) || 'log'](context.get(params.message));
+            done()
+        }
+    
+    }   
+}
+```
+
+`src/app.js`
+```javascript
+var workflow = worksmith({ 
+    task:"sequence", 
+    items: [
+        {  task:"map", map: { f1:"@p1", f2:"@p2" }, resultTo:"mapData.d1" },
+        { task:"log", message:"@mapData.d1.f1", level:"warn" }
+    ]
+});
+
+workflow({p1:"answer"}, function(err, res) {
+    console.log("workflow executed")
+})
+```
+## Getting task params injected
+Use injection rather then context.get - because 1) it is more sexy, 2) it will support async injection of params in remote workflows
+
+`src/log.js`
+```javascript
+module.exports = function define(params) {
+    //params will contain the tasks json config eg
+    // {task:"job2", message:"@p1", "level":"warn"}
+    return function(context) {
+        //context will hold the execution state e.g.
+        //{p1:"hello"}
+        execute.inject = ["message","level"]
+       function execute(msg, lvl, done) {
+            console[lvl || 'log'](msg);
+            done()
+        }
+        return execute
+    }   
+}
+```
