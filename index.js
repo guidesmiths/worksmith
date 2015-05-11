@@ -8,6 +8,7 @@ var taskTypeCache = {};
 
 var workflow =  {
 
+    
     discoverTaskType: function(taskType) {
         var processRelativePath = path.join(process.cwd(), "/src/tasks/", taskType + ".js");
         return fs.existsSync(processRelativePath) ? processRelativePath : "./tasks/" + taskType + ".js";
@@ -98,6 +99,14 @@ var workflow =  {
                         if (!err.supressMessage) {
                             console.error("Error in WF <%s>, error is:<%s> ", workflowDefinition.task, err.message || err)
                         }
+                        if (workflowDefinition.onError) {
+                            var errorWfDef = context.get(workflowDefinition.onError);
+                            var errorWf = workflow.define(errorWfDef);
+                            context.error = err;
+                            return errorWf(context, function(err) {
+                              return orig(err);
+                            })
+                        }
                         return orig(err)
                     }
                     debug("completed")
@@ -117,7 +126,7 @@ var workflow =  {
                     process.env.WSDEBUGPARAMS && debug("...invocation arguments", args)
                     return decorated.apply(this, args);
                 } catch(err) {
-                    throw err;
+                    //throw err;
                     return done(err)
                 }
 
