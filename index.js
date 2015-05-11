@@ -80,10 +80,10 @@ var workflow =  {
             if (arguments.length == 2) {
                 return build(arguments[0])(arguments[1])
             }
+            initializeContext(context)
             var decorated = wfInstance(context)
             debug("preparing: %s", workflowDefinition.task)
 
-            initializeContext(context)
 
             return function execute(done) {
 
