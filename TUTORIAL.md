@@ -194,11 +194,11 @@ module.exports = function define(params) {
         return execute
     }   
 }
-
+```
 ### Error receiver
 You can have a workflow assigned to an error event. This will receive the error in `context.error`.
 
-```
+```javascript
 var workflow = worksmith({ 
     task:"sequence", 
     items: [
@@ -219,7 +219,7 @@ var workflow = worksmith({
 You can have a workflow assigned to an error event. This can handle the error in `context.error`.  The error handler workflow has the
 option to swallow the error and let the whole main workflow to continue. Just call `done()` w/o an error to have that happen.
 
-```
+```javascript
 var workflow = worksmith({ 
     task:"sequence", 
     items: [
