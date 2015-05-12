@@ -4,7 +4,7 @@
 
 A seriously ```functional``` workflow library, that lets you build composable and configurable process definitions for various reasons.
 
-## [Step by step tutorial](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
+For a step by step tutorial click [here](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
 
 ## Highlights
 - worksmith comes with an extensible task library

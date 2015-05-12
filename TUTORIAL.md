@@ -194,3 +194,48 @@ module.exports = function define(params) {
         return execute
     }   
 }
+
+### Error receiver
+You can have a workflow assigned to an error event. This will receive the error in `context.error`.
+
+```
+var workflow = worksmith({ 
+    task:"sequence", 
+    items: [
+        {  
+            task:"some_erring_workflow", 
+            onError: {
+                task: "some_error_receiver"
+            }
+        },
+        {
+            task:"some_task_that_will_never_run"
+        }
+    ]
+});
+```
+
+### Error handler
+You can have a workflow assigned to an error event. This can handle the error in `context.error`.  The error handler workflow has the
+option to swallow the error and let the whole main workflow to continue. Just call `done()` w/o an error to have that happen.
+
+```
+var workflow = worksmith({ 
+    task:"sequence", 
+    items: [
+        {  
+            task:"some_erring_workflow", 
+            onError: {
+                handleError: true,
+                task: "some_error_handler"
+            }
+        },
+        {
+            task:"some_task_that_might_still_run"
+        }
+    ]
+});
+```
+
+
+
