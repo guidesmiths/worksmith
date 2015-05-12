@@ -10,7 +10,6 @@ describe("WorkSmith API - error handler workflow", function() {
             task: function(def) {
                 return function build(context) {
                     return function execute(done) {
-                        //throw "alma";
                         done({"some":"err", "supressMessage":true});
                     }
                 }
@@ -53,7 +52,7 @@ describe("WorkSmith API - error handler workflow", function() {
                         return function builde(context) {
                             return function execute(done) {
                                 flags.errorSet = true;
-                                done({error:"bad things happen", "supressMessage":true});
+                                done();
                             }
                         }
                     }
@@ -71,7 +70,7 @@ describe("WorkSmith API - error handler workflow", function() {
         });
     });
     
-    it("should allow executing the next workflow", function(done) {
+    it("should allow executing the next workflow if handleError is true", function(done) {
         var flags = {};
 
         var def = {
@@ -86,6 +85,7 @@ describe("WorkSmith API - error handler workflow", function() {
                     }
                 },
                 onError: {
+                    handleError: true,
                     task:function(def) {
                         return function builde(context) {
                             return function execute(done) {
@@ -108,6 +108,44 @@ describe("WorkSmith API - error handler workflow", function() {
     });
     
     
+     it("should prevent executing the next workflow if handleError is true but errorWf errs", function(done) {
+        var flags = {};
+
+        var def = {
+            task:"sequence",
+            items: [{
+                task: function(def) {
+                    return function build(context) {
+                        return function execute(done) {
+                            //throw "alma";
+                            done({"some":"err", "supressMessage":true});
+                        }
+                    }
+                },
+                onError: {
+                    handleError: true,
+                    task:function(def) {
+                        return function builde(context) {
+                            return function execute(done) {
+                                done({some:"error", "supressMessage":true});
+                            }
+                        }
+                    }
+                }
+            },
+            {task:function(def) { return function(context) {return function(done) { flags.nextWfRun = true; done() }}}}
+            
+            ]
+        };
+        
+        var workflow = worksmith(def);
+        workflow({}, function() {
+            assert.notEqual(flags.nextWfRun, true, "next wf should not be invoked")
+           done(); 
+        });
+    });
+    
+    
     it("should provide a correct err object", function(done) {
         var flags = {};
 
@@ -116,7 +154,7 @@ describe("WorkSmith API - error handler workflow", function() {
                     return function build(context) {
                         return function execute(done) {
                             //throw "alma";
-                            done({"some":"err", "supressMessage":true});
+                            done({"message":"err", "supressMessage":true});
                         }
                     }
                 },
@@ -133,7 +171,7 @@ describe("WorkSmith API - error handler workflow", function() {
         
         var workflow = worksmith(def);
         workflow({}, function(err) {
-            assert.equal(err.message, "hello", "error must be provided")
+            assert.equal(err.message, "err", "error must be provided")
            done(); 
         });
     });

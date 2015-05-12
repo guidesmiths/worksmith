@@ -103,8 +103,11 @@ var workflow =  {
                             var errorWfDef = context.get(workflowDefinition.onError);
                             var errorWf = workflow.define(errorWfDef);
                             context.error = err;
-                            return errorWf(context, function(err) {
-                              return orig(err);
+                            return errorWf(context, function(errHandlerErr) {
+                              if (errorWfDef.handleError) {
+                                return orig(errHandlerErr);
+                              }
+                              return orig(err)
                             })
                         }
                         return orig(err)
