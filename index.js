@@ -5,12 +5,14 @@ var handlebars = require('handlebars')
 var fs = require('fs')
 
 var taskTypeCache = {};
+var DEFAULT_TASK_PATH = "/src/tasks/"
+var taskPath
 
 var workflow =  {
 
-    
+
     discoverTaskType: function(taskType) {
-        var processRelativePath = path.join(process.cwd(), "/src/tasks/", taskType + ".js");
+        var processRelativePath = path.join(process.cwd(), taskPath, taskType + ".js");
         return fs.existsSync(processRelativePath) ? processRelativePath : "./tasks/" + taskType + ".js";
     },
 
@@ -28,6 +30,7 @@ var workflow =  {
     define: function (workflowDefinition) {
 
         debug("defining: %s", workflowDefinition.task)
+        taskPath = workflowDefinition.taskPath || DEFAULT_TASK_PATH
         var WorkflowType = workflow.getWorkflow(workflowDefinition.task)
 
         var wfInstance = WorkflowType(workflowDefinition)
