@@ -237,5 +237,32 @@ var workflow = worksmith({
 });
 ```
 
+## The `workflow' task type
+You can execute a complete workflow as a task. 
+Its good for shared workflow steps.
+
+Use the `workflow` task type and
+specify workflow `source` with its path or its object definition. 
+Subworkflows inherit the parent context by default.
+You can optionally set a new `context` for the subworkflow
+by specifying value for the `context` param. 
+
+```javascript
+var workflow = worksmith({ 
+    task:"sequence", 
+    items: [
+        {  
+            task:"set", 
+            name:"param",
+            value:{ abc:"def" }
+        },
+        {
+            task:"workflow",
+            source:"./src/workflows/myworkflow.js",
+            context: "@param"
+        }
+    ]
+});
+```
 
 
