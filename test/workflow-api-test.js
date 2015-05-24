@@ -100,7 +100,30 @@ describe("WorkSmith API", function() {
 
     })
 
+    it("should provide 3 args to result callbacks", function(done) {
+        var def = {
+            task: function(def) {
+                return function build(context) {
+                    return function execute(done) {
+                        done(null, 42);
+                    }
+                }
+            },
+            resultTo:"result"
+        };
+        var wf = workflow(def)
+        var context = {};
+        var wi = wf(context);
+        wi(function(err, res, ctx) {
+            assert.equal(arguments.length, 3, "args count must match")
+            assert.equal(ctx, context, "context must match")
+            done();
+        })
 
+    })
+
+
+    
     describe("parameter injector", function() {
       it("should inject definition fields correctly - static value", function(done) {
         var flags = {};

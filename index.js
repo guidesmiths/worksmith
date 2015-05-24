@@ -22,8 +22,7 @@ var workflow =  {
     },
 
     getWorkflow: function(task) {
-        if ("string" === typeof task)
-            return workflow.getTaskType(task);
+        if ("string" === typeof task) return workflow.getTaskType(task);
         return task;
     },
 
@@ -121,7 +120,7 @@ var workflow =  {
                         workflow.setValue(context, workflowDefinition.resultTo, result)
                     }
                     debug("executed: %s", workflowDefinition.task)
-                    orig(err, result);
+                    orig(err, result, context);
                 }
 
 
@@ -180,9 +179,6 @@ var workflow =  {
                 object[part] = object[part] || {};
                 object = object[part];
             } else {
-                //TODO:
-                var mapDef = value
-
                 object[part] = value;
             }
         }
@@ -193,7 +189,7 @@ var workflow =  {
 
 function wfLoader(wf) {
     if ("string" === typeof wf) {
-        wf = path.relative(__dirname, path.resolve(wf))
+        wf = path.resolve(wf)
         debug("loading workflow file: %s", wf)
         wf = require(wf);
     }
