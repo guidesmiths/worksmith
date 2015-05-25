@@ -7,17 +7,28 @@ var fs = require('fs')
 var taskTypeCache = {};
 var DEFAULT_TASK_PATH = "/src/tasks/"
 var taskPath
-
+var resolvers = {};
 var workflow =  {
 
-
+    use: function(ns, taskLibrary) {
+        resolvers[ns] = taskLibrary;
+    },
+    
     discoverTaskType: function(taskType) {
         var processRelativePath = path.join(process.cwd(), taskPath, taskType + ".js");
         return fs.existsSync(processRelativePath) ? processRelativePath : "./tasks/" + taskType + ".js";
     },
 
     getTaskType: function(taskType) {
+        if (taskType.indexOf("/") > -1) {
+            var taskSpec = taskType.split("/");
+            var ns = taskSpec[0];
+            if (resolvers[ns]) {
+                return resolvers[ns](taskSpec[1]);
+            }
+        }
         var taskFile = taskTypeCache[taskType] || (taskTypeCache[taskType] = workflow.discoverTaskType(taskType))
+        
         return require(taskFile);
     },
 
@@ -198,82 +209,3 @@ function wfLoader(wf) {
 _.extend(wfLoader, workflow);
 
 module.exports = wfLoader;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                // var result
-                // var builders = {
-                //     "[object Array]": function(o) {
-                //         return o.map(function(item) {
-                //             return workflow.readValue(item, object)
-                //         })
-                //     },
-                //     "[object Object]": function(o) {
-                //         var result = {}
-                //          Object.keys(o).forEach(function(key) {
-
-                //             result[key] = workflow.readValue(key, object)
-                //         })
-                //          return result
-                //     }
-                // }
-
-                // value = (builders[Object.prototype.toString.call(mapDef)] || (function(o) { return o })) (mapDef)
-
-
