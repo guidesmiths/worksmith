@@ -235,7 +235,23 @@ var workflow = worksmith({
         }
     ]
 });
+
 ```
+## Using a task collection module
+
+```javascript
+var worksmith = require('worksmith')
+worksmith.use("more", require('worksmith_example_module'))
+var wf = worksmith({
+    "task":"more/random",
+    resultTo: "rnd"
+});
+wf({},console.log)
+```
+
+## How to create a task collection module
+Check out an example module [here](https://github.com/PeterAronZentai/worksmith_example_module).
+
 
 ## The `workflow' task type
 You can execute a complete workflow as a task. 
