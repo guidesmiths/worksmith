@@ -15,7 +15,7 @@ describe("random activity", function() {
         wf({}, function(err, result, ctx) {
             assert.ifError(err, err);
             assert.ok(ctx.r, "result must be set")
-            assert.ok(ctr.r.match(/^[0-9\.]+$/), "result must be number")
+            assert.ok(ctx.r.match(/^[0-9\.]+$/), "result must be number")
             assert.equal(typeof ctx.r, "string")
             done(null, result)
         })

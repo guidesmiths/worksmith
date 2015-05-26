@@ -19,9 +19,15 @@ function executeSqlActivity(definition) {
                     client.end();
                     done(null, result);
                 }
-                var p = params.slice()
-                debug("executing sql command %s ", command, params)
-                client.query(command, p || [], handleResult)
+                
+                params = params || [];
+                debug("@@@@", params)
+                var p = params.map(function(value) {
+                    return context.get(value);
+                })
+                debug("executing sql command %s ", command, p)
+                //console.log("@@@@@@@@@", p)
+                client.query(command, p, handleResult)
             });
         }
         return execute;

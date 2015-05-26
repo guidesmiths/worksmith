@@ -1,3 +1,5 @@
+var _ = require('lodash')
+
 var path = require('path')
 module.exports = function(definition) {
     return function(context) {
@@ -5,6 +7,7 @@ module.exports = function(definition) {
             var jsonPath = context.get(definition.path)
             jsonPath = path.resolve(jsonPath)
             var content = require(jsonPath)
+            content = _.extend({}, content)
             done(null, content)
         }
     }
