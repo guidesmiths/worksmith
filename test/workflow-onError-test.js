@@ -175,4 +175,52 @@ describe("WorkSmith API - error handler workflow", function() {
            done(); 
         });
     });
+    
+    it("should work with a sequence activity", function(done) {
+        var flags = {};
+
+        var def = {
+                task: "sequence",
+                items: [
+                  {  
+                    task: function(def) {
+                        return function build(context) {
+                            return function execute(done) {
+                                //throw "alma";
+                                flags.step1 = true;
+                                done({"message":"err", "supressMessage":true});
+                            }
+                        }
+                    }
+                  },{  
+                    task: function(def) {
+                        return function build(context) {
+                            return function execute(done) {
+                                flags.step2 = true;
+                                done()
+                                //throw "alma";
+                            }
+                        }
+                    }
+                  }],
+                onError: {
+                    task:function(def) {
+                        return function builde(context) {
+                            return function execute(done) {
+                                flags.step3 = true;
+                                done({message:"hello", supressMessage:true});
+                            }
+                        }
+                    }
+                }
+        };
+        
+        var workflow = worksmith(def);
+        workflow({}, function(err) {
+            assert.equal(flags.step1, true, "first step must be done")
+            assert.notEqual(flags.step2, true, "second step mustnt be done")
+            assert.equal(flags.step3, true, "third step must be done")
+           done(); 
+        });
+    });
 });
