@@ -130,7 +130,17 @@ var workflow = {
                 if (!checkCondition(context))
                     return done()
 
-                var orig = done,
+                var orig = done
+                
+                if (workflowDefinition.finally) {
+                    var finallyDef = context.get(workflowDefinition.finally);
+                    var finallyWf = workflow.define(finallyDef);
+                    var _orig = orig;
+                    orig = function(err, result) {
+                        return finallyWf(context, _orig)
+                    }
+                }
+                
                 done = function(err, result) {
                     if (err) {
                         debug("error in workflow %s, error is %", workflowDefinition.task, err.message || err)
@@ -153,7 +163,7 @@ var workflow = {
                     debug("completed")
                     if (workflowDefinition.resultTo) {
                         process.env.WSDEBUGPARAMS && debug("...result is", result)
-                        workflow.setValue(context, workflowDefinition.resultTo, result)
+                        context.set(workflowDefinition.resultTo, result)
                     }
                     debug("executed: %s", workflowDefinition.task)
                     orig(err, result, context);
