@@ -1,20 +1,36 @@
 # worksmith
+A seriously `functional` workflow library, that lets you build composable and configurable process definitions for various reasons.
 
 ```npm i worksmith --save```
 
-A seriously ```functional``` workflow library, that lets you build composable and configurable process definitions for various reasons.
 
 For a step by step tutorial click [here](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
 
-## Highlights
-- worksmith comes with an extensible task library
+## Workflow steps aka tasks aka activities
+- worksmith comes with an extensible task library built up from the `core` and the `extension modules`.
+
+### Core activities
+| group | activities | description |
+| ----- | ---------- | ----------- |
+
   - Control flow:  ```sequence``` ,  ```parallel``` and ```warezSequence```
   - IO: ```log```,```sql/pg```
   - Tansformation: ```map```, ```regex```, ```set```
   - Extensibitly: ```code``` activity , create custom task types by creating files in the tasks folder
 
+### Extension modules
+
+| name | description |
+| ---  | ----------- |
+| worksmith_postgress | Execute SQL statements as part of the workflow, supports transactions |
+| worksmith_salesforce | Interact with salesforce in a workflow |
+| worksmith_etcd | Use network based locking via etcd service |
+| worksmith_assert | An assertion library to be used conventional workflows or workflows built for testing |
+| worksmith_fs | Read/write files from a workflow |
+
 - with worksmith you can build a complex async process chain from functional steps (tasks) - yet keep the application easy to understand and each functional step easy to developer and maintain. forget ```if(err) return next(err)```
 - workflow steps are unaware about each other - they communicate over a shared context. WorkSmith provides an intuitive expression syntax for working with the context in a workflow definitions
+
 ## usage
 
 ### A workflow definition:
