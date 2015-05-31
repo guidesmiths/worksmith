@@ -8,12 +8,38 @@ var taskTypeCache = {};
 var DEFAULT_TASK_PATH = "/src/tasks/"
 var taskPath
 var resolvers = {};
-var workflow =  {
+
+var settings  = {
+    logger: console
+}
+
+var worksmith
+
+function wfLoader(wf) {
+    if ("string" === typeof wf) {
+        wf = path.resolve(wf)
+        debug("loading workflow file: %s", wf)
+        wf = require(wf);
+    }
+    return worksmith.define(wf);
+}
+
+worksmith = wfLoader
+
+var workflow = {
 
     use: function(ns, taskLibrary) {
         resolvers[ns] = taskLibrary;
     },
     
+    configure: function(options) {
+        _.extend(settings, options);
+    },
+    
+    log: function() {
+        var level = arguments[0]
+        settings.logger[level].apply(settings.logger, Array.prototype.slice.call(arguments,1))
+    },
     discoverTaskType: function(taskType) {
         var processRelativePath = path.join(process.cwd(), taskPath, taskType + ".js");
         return fs.existsSync(processRelativePath) ? processRelativePath : "./tasks/" + taskType + ".js";
@@ -28,7 +54,6 @@ var workflow =  {
             }
         }
         var taskFile = taskTypeCache[taskType] || (taskTypeCache[taskType] = workflow.discoverTaskType(taskType))
-        
         return require(taskFile);
     },
 
@@ -43,7 +68,7 @@ var workflow =  {
         taskPath = workflowDefinition.taskPath || DEFAULT_TASK_PATH
         var WorkflowType = workflow.getWorkflow(workflowDefinition.task)
 
-        var wfInstance = WorkflowType(workflowDefinition)
+        var wfInstance = WorkflowType.call(wfLoader, workflowDefinition)
 
         function checkCondition(context) {
             if (!("condition" in workflowDefinition)) {
@@ -110,7 +135,7 @@ var workflow =  {
                     if (err) {
                         debug("error in workflow %s, error is %", workflowDefinition.task, err.message || err)
                         if (!err.supressMessage) {
-                            console.error("Error in WF <%s>, error is:<%s> ", workflowDefinition.task, err.message || err)
+                            worksmith.log("error","Error in WF <%s>, error is:<%s> ", workflowDefinition.task, err.message || err)
                         }
                         if (workflowDefinition.onError) {
                             var errorWfDef = context.get(workflowDefinition.onError);
@@ -198,14 +223,7 @@ var workflow =  {
 
 }
 
-function wfLoader(wf) {
-    if ("string" === typeof wf) {
-        wf = path.resolve(wf)
-        debug("loading workflow file: %s", wf)
-        wf = require(wf);
-    }
-    return workflow.define(wf);
-}
+
 _.extend(wfLoader, workflow);
 
 module.exports = wfLoader;

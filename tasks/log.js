@@ -1,12 +1,12 @@
 var debug = require('debug')('workflow:activities:log')
 
 LogActivty.annotations = {inject: ["message"]}
+
 function LogActivty(node) {
-
+    var worksmith = this;
     return function (context) {
-
         return function(message, done) {
-            console.log("LOG>", message || "Log activity")
+            worksmith.log("log", message || "Log activity")
             done();
         }
     }

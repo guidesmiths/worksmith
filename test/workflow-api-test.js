@@ -31,6 +31,27 @@ describe("WorkSmith API", function() {
         })
     })
 
+    it("should provide worksmith as 'this' for definer", function(done) {
+        var flags = {};
+
+        var def = {
+            task: function(def) {
+                flags.definerThis = this;
+                return function build(context) {
+                    return function execute(done) {
+                        done();
+                    }
+                }
+            }
+        };
+
+        var wf = workflow(def)
+        var wi = wf({});
+        wi(function(err, res) {
+            assert.equal(flags.definerThis,workflow, "worksmith instance does not match")
+            done();
+        })
+    })
 
     it("should pass definition to builder", function(done) {
         var flags = {};
