@@ -5,6 +5,7 @@ A seriously `functional` workflow library, that lets you build composable and co
 
 
 For a step by step tutorial click [here](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
+[Release notes](https://github.com/guidesmiths/worksmith/blob/master/ReleaseNotes.md)
 
 ## Workflow steps aka tasks aka activities
 - worksmith comes with an extensible task library built up from the `core` and the `extension modules`.
@@ -31,6 +32,8 @@ For a step by step tutorial click [here](https://github.com/guidesmiths/worksmit
 
 - with worksmith you can build a complex async process chain from functional steps (tasks) - yet keep the application easy to understand and each functional step easy to developer and maintain. forget ```if(err) return next(err)```
 - workflow steps are unaware about each other - they communicate over a shared context. WorkSmith provides an intuitive expression syntax for working with the context in a workflow definitions
+
+
 
 ## usage
 

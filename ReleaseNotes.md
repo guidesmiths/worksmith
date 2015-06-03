@@ -1,6 +1,10 @@
 # Worksmith release notes
+## 0.1.2
+Readme update
 
 ## 0.1.1
+
+### worksmith.createAdapter
 connect existing functionality into a workflow using worksmith.use + worksmith.createAdapter
 
 ```javascript
