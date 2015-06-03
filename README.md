@@ -5,10 +5,12 @@ A seriously `functional` workflow library, that lets you build composable and co
 
 
 For a step by step tutorial click [here](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
+
 [Release notes](https://github.com/guidesmiths/worksmith/blob/master/ReleaseNotes.md)
 
-## Workflow steps aka tasks aka activities
-- worksmith comes with an extensible task library built up from the `core` and the `extension modules`.
+##Worksmith activities / task types
+
+Worksmith comes with an extensible task library built up from the `core` and the `extension modules`.
 
 ### Core activities
 | group | activities | description |
