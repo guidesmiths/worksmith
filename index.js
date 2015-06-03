@@ -43,6 +43,23 @@ var workflow = {
         resolvers[ns] = taskLibrary;
     },
     
+    createAdapter: function(object) {
+        return function getType(name) {
+            var method = object[name];
+            return function define(step) {
+                return function build(context) {
+                    return function execute(done) {
+                        var args = (context.get(step.arguments) || [])
+                                    .map(function(arg) {
+                                        return context.get(arg);
+                                    })
+                        var result = method.apply(object, args)
+                        done(undefined, result);
+                    }
+                }
+            }
+        }
+    },
     configure: function(options) {
         _.extend(settings, options);
     },
