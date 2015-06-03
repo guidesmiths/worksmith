@@ -54,7 +54,7 @@ describe("WorkSmith logging", function() {
         workflow.configure(
             {
                 logger: {
-                    error: function(message, wf, error) {
+                    error: function(message,error) {
                         flags.message = message;
                         flags.wf = wf;
                         flags.error = error;
@@ -66,7 +66,7 @@ describe("WorkSmith logging", function() {
             task: function(def) {
                 return function build(context) {
                     return function execute(done) {
-                        done({"some":"error"});
+                        done({"message":"error"});
                     }
                 }
             }
@@ -75,7 +75,7 @@ describe("WorkSmith logging", function() {
         var wf = workflow(def)
         wf({},function(err, res) {
             assert.ok(err, "Error must be set")
-            assert.deepEqual(flags.error, {"some":"error"},"error must match")
+            assert.deepEqual(flags.error, {"message":"error"},"error must match")
             assert.ok(flags.message,"message must be set")
             assert.ok(flags.wf, "workflow must be set")
             done();

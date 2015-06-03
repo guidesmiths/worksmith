@@ -3,6 +3,8 @@ var _ = require('lodash')
 var path = require('path')
 var handlebars = require('handlebars')
 var fs = require('fs')
+var async = require('async')
+var util = require('util')
 
 var taskTypeCache = {};
 var DEFAULT_TASK_PATH = "/src/tasks/"
@@ -25,6 +27,15 @@ function wfLoader(wf) {
 }
 
 worksmith = wfLoader
+
+function getStepName(step) {
+    if (step.name) { return step.name }
+    var name = step.name || step.task;
+    if ("function" === typeof name) { 
+        name =  "<Anonymous>" + name.name 
+    }
+    return step.name = name;
+}
 
 var workflow = {
 
@@ -61,10 +72,12 @@ var workflow = {
         if ("string" === typeof task) return workflow.getTaskType(task);
         return task;
     },
+    
+    
 
     define: function (workflowDefinition) {
 
-        debug("defining: %s", workflowDefinition.task)
+        debug("defining: %s", getStepName(workflowDefinition))
         taskPath = workflowDefinition.taskPath || DEFAULT_TASK_PATH
         var WorkflowType = workflow.getWorkflow(workflowDefinition.task)
 
@@ -75,8 +88,7 @@ var workflow = {
                 return true;
             }
             with(context) {
-                var result = eval(workflowDefinition.condition)
-                if (result) {
+                if (eval(workflowDefinition.condition)) {
                     return true;
                 }
                 return false;
@@ -121,66 +133,76 @@ var workflow = {
             }
             initializeContext(context)
             var decorated = wfInstance(context)
-            debug("preparing: %s", workflowDefinition.task)
+            debug("preparing: %s", getStepName(workflowDefinition))
 
-
+            
             return function execute(done) {
-
 
                 if (!checkCondition(context))
                     return done()
 
-                var orig = done
-                
-                if (workflowDefinition.finally) {
+                function invokeDecorated(err, res, next) {
+                    var args = getArgumentsFromAnnotations(context, decorated, wfInstance)
+                    args.push(next)
+                    try {
+                        decorated.apply(this, args)
+                    } catch(ex) {
+                        next(ex)
+                    }
+                }
+
+                function onError(err, res, next) {
+                    if (!err) { return next(err, res) }
+                    var errorWfDef = context.get(workflowDefinition.onError);
+                    var errorWf = workflow.define(errorWfDef);
+                    context.error = err;
+                    errorWf(context, function(errHandlerErr, errRes) { 
+                        if (errorWfDef.handleError) err = errHandlerErr;
+                        next(err, res);
+                    })
+                }
+
+                function onComplete(err, res, next) {
                     var finallyDef = context.get(workflowDefinition.finally);
                     var finallyWf = workflow.define(finallyDef);
-                    var _orig = orig;
-                    orig = function(err, result) {
-                        return finallyWf(context, _orig)
+                    finallyWf(context, function(finErr, finRes) {
+                        next(err, res)
+                    })
+                }
+                function logErrors(err, result, next) {
+                    if (err) {
+                        debug("error in workflow %s, error is %o", getStepName(workflowDefinition), err.message || err)
+                        if (!err.supressMessage) {
+                            worksmith.log("error",util.format("Error in WF <%s>, error is:<%s> ", getStepName(workflowDefinition), err.message),err)
+                        }
                     }
+                    next(err, result)
                 }
                 
-                done = function(err, result) {
-                    if (err) {
-                        debug("error in workflow %s, error is %", workflowDefinition.task, err.message || err)
-                        if (!err.supressMessage) {
-                            worksmith.log("error","Error in WF <%s>, error is:<%s> ", workflowDefinition.task, err.message || err)
-                        }
-                        if (workflowDefinition.onError) {
-                            var errorWfDef = context.get(workflowDefinition.onError);
-                            var errorWf = workflow.define(errorWfDef);
-                            context.error = err;
-                            return errorWf(context, function(errHandlerErr) {
-                              if (errorWfDef.handleError) {
-                                return orig(errHandlerErr);
-                              }
-                              return orig(err)
-                            })
-                        }
-                        return orig(err)
-                    }
-                    debug("completed")
-                    if (workflowDefinition.resultTo) {
-                        process.env.WSDEBUGPARAMS && debug("...result is", result)
-                        context.set(workflowDefinition.resultTo, result)
-                    }
-                    debug("executed: %s", workflowDefinition.task)
-                    orig(err, result, context);
+                function setWorkflowResultTo(err, result, next) {
+                    if (err) { return next(err, result) }
+                    process.env.WSDEBUGPARAMS && debug("...result is", result)
+                    context.set(workflowDefinition.resultTo, result)
+                    next(err, result)
                 }
 
-
-                debug("executing: %s", workflowDefinition.task)
-                try {
-                    var args = getArgumentsFromAnnotations(context, decorated, wfInstance)
-                    args.push(done)
-                    process.env.WSDEBUGPARAMS && debug("...invocation arguments", args)
-                    return decorated.apply(this, args);
-                } catch(err) {
-                    //throw err;
-                    return done(err)
+                var tasks = [invokeDecorated];
+                workflowDefinition.onError && tasks.push(onError)
+                workflowDefinition.finally && tasks.push(onComplete)
+                workflowDefinition.resultTo && tasks.push(setWorkflowResultTo)
+                tasks.push(logErrors)
+                
+                function executeNextThunkOrComplete(err, res) {
+                    var thunk = tasks.shift();
+                    if (thunk) {
+                        return thunk(err, res, executeNextThunkOrComplete)
+                    } 
+                    debug("Finished executing WF %s", getStepName(workflowDefinition))
+                    done(err, res, context)
                 }
-
+                debug("Executing WF %s", getStepName(workflowDefinition))
+                return executeNextThunkOrComplete()
+               
             }
         }
     },
