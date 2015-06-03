@@ -22,9 +22,10 @@ For a step by step tutorial click [here](https://github.com/guidesmiths/worksmit
 
 | name | description |
 | ---  | ----------- |
-| worksmith_postgress | Execute SQL statements as part of the workflow, supports transactions |
 | worksmith_salesforce | Interact with salesforce in a workflow |
 | worksmith_etcd | Use network based locking via etcd service |
+| coming | soon |
+| worksmith_postgres | Execute SQL statements as part of the workflow, supports transactions |
 | worksmith_assert | An assertion library to be used conventional workflows or workflows built for testing |
 | worksmith_fs | Read/write files from a workflow |
 
