@@ -1,4 +1,8 @@
 # Worksmith release notes
+
+## 0.1.4
+Error logging temporalily removed
+
 ## 0.1.2, 0.1.3
 Readme update
 
