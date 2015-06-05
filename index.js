@@ -189,9 +189,9 @@ var workflow = {
                 function logErrors(err, result, next) {
                     if (err) {
                         debug("error in workflow %s, error is %o", getStepName(workflowDefinition), err.message || err)
-                        if (!err.supressMessage) {
-                            worksmith.log("error",util.format("Error in WF <%s>, error is:<%s> ", getStepName(workflowDefinition), err.message),err)
-                        }
+                        //if (!err.supressMessage) {
+                        //    worksmith.log("error",util.format("Error in WF <%s>, error is:<%s> ", getStepName(workflowDefinition), err.message),err)
+                        //}
                     }
                     next(err, result)
                 }

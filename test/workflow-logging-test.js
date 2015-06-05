@@ -48,7 +48,8 @@ describe("WorkSmith logging", function() {
         })
     })
     
-    it("should support reconfiguring logger for worksmith errors", function(done) {
+    //this test is left pending until logErrors config setting is implemented
+    xit("should support reconfiguring logger for worksmith errors", function(done) {
         var flags = {};
         var logs = [];
         workflow.configure(
