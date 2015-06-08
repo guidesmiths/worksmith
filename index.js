@@ -151,18 +151,47 @@ var workflow = {
             initializeContext(context)
             var decorated = wfInstance(context)
             debug("preparing: %s", getStepName(workflowDefinition))
+            
+
+            var markWorkflowTerminate = function(done) {
+                context.completionStack = context.completionStack || []
+                context.completionStack.push(done)
+                if (!context.workflowTerminate) {
+                    context.workflowTerminate = done
+                }
+            }
 
             
             return function execute(done) {
 
+                
                 if (!checkCondition(context))
                     return done()
-
+                
+                markWorkflowTerminate(done)
+                
                 function invokeDecorated(err, res, next) {
+                    function createExecutionThisContext() {
+                        return {
+                            workflow: {
+                                terminate: function(err, res, next) {
+                                    context.originalTerminate = done
+                                    done = context.workflowTerminate
+                                    next(err, res)
+                                },
+                                terminateParent: function(err, res, next, step) {
+                                    context.originalTerminate = done
+                                    done =  context.completionStack[context.completionStack.length - (step || 2)]
+                                    next(err, res)
+                                }
+                            }
+                        }
+                    }
+                    
                     var args = getArgumentsFromAnnotations(context, decorated, wfInstance)
                     args.push(next)
                     try {
-                        decorated.apply(this, args)
+                        decorated.apply(createExecutionThisContext(), args)
                     } catch(ex) {
                         next(ex)
                     }
@@ -189,6 +218,7 @@ var workflow = {
                 function logErrors(err, result, next) {
                     if (err) {
                         debug("error in workflow %s, error is %o", getStepName(workflowDefinition), err.message || err)
+                        //make logging errors a configation options
                         //if (!err.supressMessage) {
                         //    worksmith.log("error",util.format("Error in WF <%s>, error is:<%s> ", getStepName(workflowDefinition), err.message),err)
                         //}
@@ -202,21 +232,31 @@ var workflow = {
                     context.set(workflowDefinition.resultTo, result)
                     next(err, result)
                 }
+                
+                function buildUpMicroworkflow() {
+                    var tasks = [invokeDecorated];
+                    workflowDefinition.onError && tasks.push(onError)
+                    workflowDefinition.finally && tasks.push(onComplete)
+                    workflowDefinition.resultTo && tasks.push(setWorkflowResultTo)
+                    tasks.push(logErrors)
+                    return tasks;
+                }
 
-                var tasks = [invokeDecorated];
-                workflowDefinition.onError && tasks.push(onError)
-                workflowDefinition.finally && tasks.push(onComplete)
-                workflowDefinition.resultTo && tasks.push(setWorkflowResultTo)
-                tasks.push(logErrors)
+                var tasks = buildUpMicroworkflow();
                 
                 function executeNextThunkOrComplete(err, res) {
                     var thunk = tasks.shift();
                     if (thunk) {
-                        return thunk(err, res, executeNextThunkOrComplete)
-                    } 
+                        return thunk( err, res, executeNextThunkOrComplete)
+                    }
+                    
                     debug("Finished executing WF %s", getStepName(workflowDefinition))
+                    var originalDone = context.originalTerminate || done;
+                    var donePosition = context.completionStack.indexOf(originalDone);
+                    context.completionStack.splice(donePosition, 1)
                     done(err, res, context)
                 }
+                
                 debug("Executing WF %s", getStepName(workflowDefinition))
                 return executeNextThunkOrComplete()
                
