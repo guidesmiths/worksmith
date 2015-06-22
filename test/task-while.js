@@ -3,7 +3,7 @@ var assert = require('assert')
 
 describe("whileActivity", function () {
 
-    xit("should iterate until condition is falsey", function (done) {
+    it("should iterate until condition is falsey", function (done) {
         var context = { flag: true, count: 0 };
 
         var wi = workflow({
