@@ -31,12 +31,12 @@ describe("eachSeriesActivity", function () {
 
     it("should not barf on large loops", function (done) {
 
-        this.timeout(10000)
+        this.timeout(20000)
         var context = { count: 0 }
 
         var wi = workflow({
             task: "eachSeries",
-            items: _.range(0, 999999),
+            items: _.range(0, 99999),
             subflow: {
                 task: function(definition) {
                     return function(context) {
@@ -51,7 +51,7 @@ describe("eachSeriesActivity", function () {
 
         wi(function (err, result) {
             assert.ifError(err)
-            assert.equal(context.count, 999999)
+            assert.equal(context.count, 99999)
             done()
         })
     })
