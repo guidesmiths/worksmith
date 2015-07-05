@@ -11,7 +11,7 @@ describe("workflowActivity", function () {
         worksmith({
             "task": "workflow",
             "source":"./test/workflow1.js",
-            "context": innerContext
+            "context": { _np_: innerContext }
         })({}, function (err, result) {
             assert.equal(innerContext.result, "hello", "inner context field must match")
             done();
