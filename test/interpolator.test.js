@@ -88,12 +88,14 @@ describe("interpolator [hbs]", function() {
         assert.equal(interpolator.interpolate({a:1},"[hbs]a={{a}}[/hbs]"),"a=1")
     })
 })
-
+describe("interpolator # (eval shortcut)", function() {
+    it("should support constant values", function() {
+        assert.ok(interpolator.interpolate({a:1},"#a+1") === 2)
+    })
+})
 describe("interpolator [eval]", function() {
     it("should support constant values", function() {
-        var mark = "[eval]42[/eval]"
-        var parsed = interpolator.parse(mark) 
-        assert.equal(parsed[0]({a:1}), 42)
+        assert.equal(interpolator.interpolate({a:1},"[eval]42[/eval]"),42)
     })
     it("should support solo markup with type return value", function() {
         assert.equal(interpolator.interpolate({a:1},"[eval]a[/eval]"),1)

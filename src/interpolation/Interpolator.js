@@ -47,14 +47,27 @@ Interpolator.prototype.rules = {
             action: function(interpolator, context, value) { return context } 
         },
         {
+            name: "eval shorthand",
+            match: function(value) { return value[0] == '#' },
+            action: function(interpolator, context, value) { 
+                with(context) {
+                    return eval(value.slice(1))
+                } 
+           }
+        },
+        {
             name: "context member reference",
             match: function(value) { return value[0] == '@' },
-            action: function(interpolator, context, value) { return interpolator.readContextPath(context, value.slice(1)) }
+            action: function(interpolator, context, value) { 
+                return interpolator.readContextPath(context, value.slice(1)) 
+           }
         },
         {
             name: "markup resolver",
             match: function(value) { return value.indexOf("[") > -1 },
-            action: function(interpolator, context, value) { return interpolator.interpolateString(context, value) }
+            action: function(interpolator, context, value) { 
+                return interpolator.interpolateString(context, value) 
+            }
         }],
     "[object Array]": [
         {
