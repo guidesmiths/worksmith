@@ -2,6 +2,7 @@
 var assert = require('assert')
 var interpolator = require('../src/interpolation')
 
+describe("interpolator", function() {
 describe("interpolator parser", function() {
     it("should find tags in a text", function() {
         var mark = "abc[123]def[/123]hij"
@@ -26,6 +27,10 @@ describe("interpolator v1 interpolation", function() {
     it("should return the context for '@'", function() {
         var ctx = {a:1};
         assert.equal(interpolator.interpolate(ctx,"@"),ctx)
+    })
+    it("should support the {template:...} clause", function() {
+        var ctx = {a:1};
+        assert.ok(interpolator.interpolate(ctx,{template:"{{a}}"}) === "1")
     })
     it("should return a number constant", function() {
         var ctx = {a:1};
@@ -73,6 +78,17 @@ describe("interpolator - non-processed values", function() {
     })
 })
 
+describe("interpolator [hbs]", function() {
+    it("should support constant values", function() {
+        var mark = "[hbs]42[/hbs]"
+        var parsed = interpolator.parse(mark) 
+        assert.equal(parsed[0]({a:1}), "42")
+    })
+    it("should support context values", function() {
+        assert.equal(interpolator.interpolate({a:1},"[hbs]a={{a}}[/hbs]"),"a=1")
+    })
+})
+
 describe("interpolator [eval]", function() {
     it("should support constant values", function() {
         var mark = "[eval]42[/eval]"
@@ -90,6 +106,7 @@ describe("interpolator [eval]", function() {
         var parsed = interpolator.parse(mark) 
         assert.equal(parsed[0]({f : 1, a:['x','y','z']}),'y')
     })
+})
 })
 
 

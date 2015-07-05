@@ -1,3 +1,5 @@
+var handlebars = require('handlebars')
+
 function Interpolator(parser) {
     var self = this
 
