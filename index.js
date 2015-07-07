@@ -114,11 +114,11 @@ var workflow = {
 
         function initializeContext(context) {
             if (!context.initialized) {
-                context.get = function(name) {
-                    return workflow.readValue(name, context)
+                context.get = function(name, interpolate) {
+                    return workflow.readValue(name, this, interpolate)
                 },
                 context.set = function(name, value) {
-                    return workflow.setValue(context, name, value)
+                    return workflow.setValue(this, name, value)
                 }
                 context.initialized = true;
             }
@@ -131,11 +131,17 @@ var workflow = {
             var annotations = execute.annotations || build.annotations || WorkflowType.annotations;
             annotations = annotations || {};
             execute.inject && (annotations.inject = execute.inject);
-            annotations.inject && annotations.inject.forEach(function(name) {
+            annotations.inject && annotations.inject.forEach(function(injectable) {
+                if ("string" === typeof injectable) {
+                    injectable = {
+                        name: injectable,
+                        interpolationPolicy: true,
+                    }
+                }
                 var arg;
-                switch(name[0]) {
-                    case '@': arg = context.get(name); break;
-                    default: arg = context.get(workflowDefinition[name]); break;
+                switch(injectable.name[0]) {
+                    case '@': arg = context.get(injectable.name); break;
+                    default: arg = context.get(workflowDefinition[injectable.name],injectable.interpolationPolicy); break;
                 }
                 args.push(arg)
             })
@@ -263,8 +269,8 @@ var workflow = {
         }
     },
 
-    readValue: function(pathOrValue, context) {
-        return interpolate(context, pathOrValue)
+    readValue: function(pathOrValue, context, interpolationPolicy) {
+        return interpolate(context, pathOrValue, interpolationPolicy)
     },
 
     setValue: function (object, path, value) {

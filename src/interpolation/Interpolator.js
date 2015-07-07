@@ -23,9 +23,15 @@ function Interpolator(parser) {
     },
     
 
-    this.interpolate = function(context, value) {
+    this.interpolate = function(context, value, interpolationPolicy) {
             var index = 0
             var matched = false
+            if (interpolationPolicy === undefined) {
+                interpolationPolicy = true;
+            }
+            if (!interpolationPolicy) {
+                return value;
+            }
             var interpolationRules = self.rules[Object.prototype.toString.call(value)]
             if (!interpolationRules)  
                 return value
