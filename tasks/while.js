@@ -3,8 +3,8 @@ var async = require('async')
 
 function whileActivity(node) {
     return function (context) {
-        return function(done) {
-            var subflow = context.get(node.subflow)
+        execute.inject = [{name: "subflow", interpolationPolicy: false } ] 
+        function execute(subflow, done) {
             var result
             async.whilst(function() {
                 return context.get(node.test)
@@ -20,6 +20,7 @@ function whileActivity(node) {
                 done(err, result)
             })
         }
+        return execute;
     }
 }
 
