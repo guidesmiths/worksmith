@@ -1,6 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts"/>
 var assert = require('assert')
 var interpolator = require('../src/interpolation')
+var worksmith = require('../')
 
 describe("interpolator", function() {
 describe("interpolator parser", function() {
@@ -93,6 +94,7 @@ describe("interpolator # (eval shortcut)", function() {
         assert.ok(interpolator.interpolate({a:1},"#a+1") === 2)
     })
 })
+
 describe("interpolator [eval]", function() {
     it("should support constant values", function() {
         assert.equal(interpolator.interpolate({a:1},"[eval]42[/eval]"),42)
@@ -109,6 +111,50 @@ describe("interpolator [eval]", function() {
         assert.equal(parsed[0]({f : 1, a:['x','y','z']}),'y')
     })
 })
+
+describe("embedded workflow content", function() {
+    it("should not be interpolate too early", function(done) {
+        var cache = {};
+        var wf = {
+            task:"while",
+            test:"#fo == 'bar'", 
+            subflow: {
+                task:"sequence",
+                items: [
+                    {
+                        task: function define(node) {
+                            return function build(context) {
+                                return function execute(done) {
+                                    context.fo = "baz";
+                                    done(undefined, "hello there")
+                                }
+                            }
+                        },
+                        resultTo:"f1"
+                    },
+                    {
+                        task: function define(node) {
+                            return function(context) {
+                                execute.annotations = { inject:["p1"] }
+                                function execute(p1, done) {
+                                    cache.p1 = p1;
+                                    done();
+                                }
+                                return execute;
+                            }
+                        },
+                        p1:"@f1" 
+                    }
+                ]
+            }
+        }
+        worksmith(wf)({fo:'bar'}, function() {
+            done()
+        });
+    })
+
+})
+
 })
 
 

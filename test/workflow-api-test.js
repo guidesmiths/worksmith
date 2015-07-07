@@ -229,4 +229,34 @@ describe("WorkSmith API", function() {
         })
     })
 
+    it("should handle injecting arrays ", function(done) {
+        var flags = {};
+
+        var def = {
+
+            task: function(def) {
+                function build(context) {
+                    function execute(f1, f2, done) {
+                        flags.f1 = f1;
+                        flags.f2 = f2;
+                        done();
+                    }
+                    execute.annotations = { inject:["f1","f2"] }
+                    return execute
+                }
+                return build
+            },
+            f1: "@field1",
+            f2: "@field2"
+        };
+
+        var wf = workflow(def)
+        var context = { field1:"value1", field2:["a","b","c"] };
+        var wi = wf(context);
+        wi(function(err, res) {
+            assert.equal(flags.f1,"value1", "injected must be passed correctly")
+            assert.equal(flags.f2, context.field2, "injected must be passed correctly")
+            done();
+        })
+    })
 })

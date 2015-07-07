@@ -5,7 +5,7 @@ var _ = require('lodash')
 describe("eachSeriesActivity", function () {
 
     it("should iterate over a list of items", function (done) {
-        var context = { count: 0 };
+        var context = { counter: {count: 0 }};
 
         var wi = workflow({
             task: "eachSeries",
@@ -14,7 +14,7 @@ describe("eachSeriesActivity", function () {
                 task: function(definition) {
                     return function(context) {
                         return function(done) {
-                            context.count++
+                            context.counter.count++
                             done()
                         }
                     }
@@ -24,7 +24,7 @@ describe("eachSeriesActivity", function () {
 
         wi(function (err, result) {
             assert.ifError(err)
-            assert.equal(context.count, 3)
+            assert.equal(context.counter.count, 3)
             done()
         })
     })
@@ -32,7 +32,7 @@ describe("eachSeriesActivity", function () {
     it("should not barf on large loops", function (done) {
 
         this.timeout(20000)
-        var context = { count: 0 }
+        var context = { counter: { count: 0 } }
 
         var wi = workflow({
             task: "eachSeries",
@@ -41,7 +41,7 @@ describe("eachSeriesActivity", function () {
                 task: function(definition) {
                     return function(context) {
                         return function(done) {
-                            context.count++
+                            context.counter.count++
                             done()
                         }
                     }
@@ -51,13 +51,13 @@ describe("eachSeriesActivity", function () {
 
         wi(function (err, result) {
             assert.ifError(err)
-            assert.equal(context.count, 99999)
+            assert.equal(context.counter.count, 99999)
             done()
         })
     })
 
     it("should work in nested loops", function (done) {
-        var context = { count: 0 };
+        var context = { counter: {count: 0 } };
 
         var wi = workflow({
             task: "eachSeries",
@@ -69,7 +69,7 @@ describe("eachSeriesActivity", function () {
                     task: function(definition) {
                         return function(context) {
                             return function(done) {
-                                context.count++
+                                context.counter.count++
                                 done()
                             }
                         }
@@ -80,7 +80,7 @@ describe("eachSeriesActivity", function () {
 
         wi(function (err, result) {
             assert.ifError(err)
-            assert.equal(context.count, 9)
+            assert.equal(context.counter.count, 9)
             done()
         })
     })
