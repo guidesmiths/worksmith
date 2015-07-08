@@ -25,6 +25,12 @@ function wfLoader(wf) {
         debug("loading workflow file: %s", wf)
         wf = require(wf);
     }
+    if(Array.isArray(wf)) {
+        wf = {
+            task: "sequence",
+            items: wf
+        }
+    }
     return worksmith.define(wf);
 }
 

@@ -1,4 +1,25 @@
 # Worksmith release notes
+## 0.2.3
+An array in  place of a task or workflow variable means an implicit "sequence" task
+```javascript
+var wf = worksmith([
+    { task: "set", name:"p1", value:"hello" }
+    { task:"log" }
+    { task:"eachSeries", item:[1,2,3], subflow: [
+        { task:"log" message:"@item" }, 
+        {task:"delay", duration:"[eval]item * 250[/eval]" }
+     ]}
+]);
+wf({}, function(err, res) { });
+```
+
+## 0.2.2
+Totally revamped interpolation logic, deep tree interpolation, array interpolation
+
+tag support to drive interpolation mode: {{hbs}} and {{eval}} are support out of the box
+
+## 0.1.7
+eachSeriesActivity and whileActivity
 
 ## 0.1.5
 Terminate a workflow or sequence from code (a programmable alternative to conditional="predicate" attribute)

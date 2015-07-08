@@ -228,7 +228,16 @@ describe("WorkSmith API", function() {
             done();
         })
     })
-
+    it("should provide shortcut for sequence acitivity", function(done) {
+        var steps = [];
+        var counter = 0;
+        steps.push({task: function() { return function() {  return function(done) { counter++; done(); }}}});
+        steps.push({task: function() { return function() {  return function(done) { counter++; done(); }}}});
+        workflow(steps)({}, function() {
+            assert.equal(counter, 2)
+            done();
+        })
+    })
     it("should handle injecting arrays ", function(done) {
         var flags = {};
 
