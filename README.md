@@ -5,7 +5,7 @@ A seriously `functional` workflow library, that lets you build composable and co
 
 
 For a step by step tutorial click [here](https://github.com/guidesmiths/worksmith/blob/master/TUTORIAL.md)
-[Interpolation features](https://github.com/guidesmiths/worksmith/blob/master/Interpolation.md)
+
 [Release notes](https://github.com/guidesmiths/worksmith/blob/master/ReleaseNotes.md)
 
 ##Worksmith activities / task types
