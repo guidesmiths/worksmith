@@ -9,24 +9,25 @@ function executeSqlActivity(definition) {
         execute.annotations = {inject: ["command", "params", "connection"]};
         function execute(command, params, connection, done) {
 
-            pg.connect(connection, function(err, client) {
+            pg.connect(connection, function(err, client, dbDone) {
                 if (err) {
                     debug("Connection error", err)
                     return done(err)
                 }
                 function handleResult(err, result) {
-                    if (err) return done(err);
-                    client.end();
-                    done(null, result);
+                    if (!err) {
+                        dbDone();
+                        return done(undefined, result)
+                    }
+                    dbDone(client)
+                    return done(err);
                 }
                 
                 params = params || [];
-                debug("@@@@", params)
                 var p = params.map(function(value) {
                     return context.get(value);
                 })
                 debug("executing sql command %s ", command, p)
-                //console.log("@@@@@@@@@", p)
                 client.query(command, p, handleResult)
             });
         }
