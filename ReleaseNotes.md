@@ -3,8 +3,8 @@
 An array in  place of a task or workflow variable means an implicit "sequence" task
 ```javascript
 var wf = worksmith([
-    { task: "set", name:"p1", value:"hello" }
-    { task:"log" }
+    { task: "set", name:"p1", value:"hello" },
+    { task:"log" },
     { task:"eachSeries", item:[1,2,3], subflow: [
         { task:"log" message:"@item" }, 
         {task:"delay", duration:"[eval]item * 250[/eval]" }
