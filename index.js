@@ -39,8 +39,8 @@ worksmith = wfLoader
 function getStepName(step) {
     if (step.name) { return step.name }
     var name = step.name || step.task;
-    if ("function" === typeof name) { 
-        name =  "<Anonymous>" + name.name 
+    if ("function" === typeof name) {
+        name =  "<Anonymous>" + name.name
     }
     return step.name = name;
 }
@@ -50,7 +50,7 @@ var workflow = {
     use: function(ns, taskLibrary) {
         resolvers[ns] = taskLibrary;
     },
-    
+
     createAdapter: function(object) {
         return function getType(name) {
             var method = object[name];
@@ -68,7 +68,11 @@ var workflow = {
     configure: function(options) {
         _.extend(settings, options);
     },
-    
+
+    hasLogLevel: function(level) {
+        return settings.logger[level] !== undefined
+    },
+
     log: function() {
         var level = arguments[0]
         settings.logger[level].apply(settings.logger, Array.prototype.slice.call(arguments,1))
@@ -94,8 +98,8 @@ var workflow = {
         if ("string" === typeof task) return workflow.getTaskType(task);
         return task;
     },
-    
-    
+
+
 
     define: function (workflowDefinition) {
 
@@ -162,7 +166,7 @@ var workflow = {
             initializeContext(context)
             var decorated = wfInstance(context)
             debug("preparing: %s", getStepName(workflowDefinition))
-            
+
 
             var markWorkflowTerminate = function(done) {
                 context.completionStack = context.completionStack || []
@@ -172,15 +176,15 @@ var workflow = {
                 }
             }
 
-            
+
             return function execute(done) {
 
-                
+
                 if (!checkCondition(context))
                     return done()
-                
+
                 markWorkflowTerminate(done)
-                
+
                 function invokeDecorated(err, res, next) {
                     function createExecutionThisContext() {
                         return {
@@ -198,7 +202,7 @@ var workflow = {
                             }
                         }
                     }
-                    
+
                     var args = getArgumentsFromAnnotations(context, decorated, wfInstance)
                     args.push(next)
                     try {
@@ -213,7 +217,7 @@ var workflow = {
                     var errorWfDef = context.get(workflowDefinition.onError);
                     var errorWf = workflow.define(errorWfDef);
                     context.error = err;
-                    errorWf(context, function(errHandlerErr, errRes) { 
+                    errorWf(context, function(errHandlerErr, errRes) {
                         if (errorWfDef.handleError) err = errHandlerErr;
                         next(err, res);
                     })
@@ -236,14 +240,14 @@ var workflow = {
                     }
                     next(err, result)
                 }
-                
+
                 function setWorkflowResultTo(err, result, next) {
                     if (err) { return next(err, result) }
                     process.env.WSDEBUGPARAMS && debug("...result is", result)
                     context.set(workflowDefinition.resultTo, result)
                     next(err, result)
                 }
-                
+
                 function buildUpMicroworkflow() {
                     var tasks = [invokeDecorated];
                     workflowDefinition.onError && tasks.push(onError)
@@ -254,23 +258,23 @@ var workflow = {
                 }
 
                 var tasks = buildUpMicroworkflow();
-                
+
                 function executeNextThunkOrComplete(err, res) {
                     var thunk = tasks.shift();
                     if (thunk) {
                         return thunk( err, res, executeNextThunkOrComplete)
                     }
-                    
+
                     debug("Finished executing WF %s", getStepName(workflowDefinition))
                     var originalDone = context.originalTerminate || done;
                     var donePosition = context.completionStack.indexOf(originalDone);
                     context.completionStack.splice(donePosition, 1)
                     done(err, res, context)
                 }
-                
+
                 debug("Executing WF %s", getStepName(workflowDefinition))
                 return executeNextThunkOrComplete()
-               
+
             }
         }
     },
