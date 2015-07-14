@@ -21,7 +21,7 @@ function Interpolator(parser) {
     this.interpolateString = function(context, value) {
         return parser.assemble(context, parser.parse(value))
     },
-    
+
 
     this.interpolate = function(context, value, interpolationPolicy) {
             var index = 0
@@ -33,14 +33,12 @@ function Interpolator(parser) {
                 return value;
             }
             var interpolationRules = self.rules[Object.prototype.toString.call(value)]
-            if (!interpolationRules)  
+            if (!interpolationRules)
                 return value
 
             while(index < interpolationRules.length && !( matched = interpolationRules[index].match(value) )) index++
-
-            if (!matched) 
+            if (!matched)
                 return value
-
             return interpolationRules[index].action(self, context, value)
     }
 }
@@ -50,36 +48,45 @@ Interpolator.prototype.rules = {
         {
             name: "context reference",
             match: function(value) {("@" === value) },
-            action: function(interpolator, context, value) { return context } 
+            action: function(interpolator, context, value) { return context }
         },
         {
             name: "eval shorthand",
             match: function(value) { return value[0] == '#' },
-            action: function(interpolator, context, value) { 
+            action: function(interpolator, context, value) {
                 with(context) {
                     return eval(value.slice(1))
-                } 
+                }
            }
         },
         {
             name: "context member reference",
             match: function(value) { return value[0] == '@' },
-            action: function(interpolator, context, value) { 
-                return interpolator.readContextPath(context, value.slice(1)) 
+            action: function(interpolator, context, value) {
+                return interpolator.readContextPath(context, value.slice(1))
+           }
+        },
+        {
+            name: "conditional statement",
+            match: function(value) { return /(.+)(>|==|===|!=|!==|<|>=|<=)(.+)/.test(value) },
+            action: function(interpolator, context, value) {
+                with(context) {
+                    return eval(value)
+                }
            }
         },
         {
             name: "markup resolver",
             match: function(value) { return value.indexOf("[") > -1 },
-            action: function(interpolator, context, value) { 
-                return interpolator.interpolateString(context, value) 
+            action: function(interpolator, context, value) {
+                return interpolator.interpolateString(context, value)
             }
         }],
     "[object Array]": [
         {
             name: "object field interpolator",
             match: function(value) { return true },
-            action: function(interpolator, context, value) { 
+            action: function(interpolator, context, value) {
                 var result = []
                 for (var index = 0; index < value.length; index++) {
                     result.push(interpolator.interpolate(context, value[index]))
@@ -96,7 +103,7 @@ Interpolator.prototype.rules = {
         {
             name: "legacy {template:'...'} field resolver",
             match: function(value) { return "template" in value },
-            action: function(interpolator, context, value) { 
+            action: function(interpolator, context, value) {
                 console.warn("obsoleted functionality: { template: value }, use [hbs]..[/hbs] instead")
                 var template = value.template
                 var compiled = handlebars.compile(template)
@@ -106,7 +113,7 @@ Interpolator.prototype.rules = {
         {
             name: "object field interpolator",
             match: function(value) { return true },
-            action: function(interpolator, context, value) { 
+            action: function(interpolator, context, value) {
                 var result = {}
                 var keys = Object.keys(value)
                 for (var index = 0; index < keys.length; index++) {
