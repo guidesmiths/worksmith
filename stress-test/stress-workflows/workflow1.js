@@ -19,7 +19,7 @@ module.exports = {
         },
         {
             "task": "while",
-            "test": "objectList.length > 0",
+            "test": "[eval]objectList.length > 0[/eval]",
             "subflow": [
                 {
                     "task": "lodash/initial",

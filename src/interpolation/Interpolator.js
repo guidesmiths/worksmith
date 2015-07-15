@@ -67,15 +67,6 @@ Interpolator.prototype.rules = {
            }
         },
         {
-            name: "conditional statement",
-            match: function(value) { return /(.+)(>|==|===|!=|!==|<|>=|<=)(.+)/.test(value) },
-            action: function(interpolator, context, value) {
-                with(context) {
-                    return eval(value)
-                }
-           }
-        },
-        {
             name: "markup resolver",
             match: function(value) { return value.indexOf("[") > -1 },
             action: function(interpolator, context, value) {
