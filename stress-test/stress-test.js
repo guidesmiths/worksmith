@@ -1,16 +1,38 @@
 var worksmith = require('..')
 var _ = require('lodash')
+var async = require('async')
 packageJson = require('../package.json')
 
 console.log('Stress tests for worksmith version ', packageJson.version)
 
-try {
+var SAMPLE_SIZE = 100
 
+try {
     worksmith.use("lodash", worksmith.createAdapter(require('lodash')))
     var workflow = worksmith("./stress-test/stress-workflows/workflow1.js")
-    var ctx = {}
-    workflow(ctx, function(err, results) { if (err) console.error('There was an error running a workflow: ', err.toString()) })
-
+    console.log('About to execute workflow1')
+    calculateAverageExecTime(function(average) {
+        console.log('The average execution time is: ', average, ' ms')
+    })
 } catch(e) {
-    console.error('There was an error configuring old data deletion: ', e)
+    console.error('There was an error setting up a workflow: ', e)
+}
+
+function calculateAverageExecTime(next) {
+    var average = counter = 0
+    async.whilst(
+        function () { return counter < SAMPLE_SIZE },
+        function (cb) {
+            counter++;
+            var ctx = {}
+            workflow(ctx, function(err, results) {
+                if (err) console.error('There was an error running a workflow: ', err.toString())
+                average += ctx.duration
+                cb()
+            })
+        },
+        function (err) {
+            next(average / SAMPLE_SIZE)
+        }
+    )
 }
