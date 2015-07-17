@@ -1,21 +1,30 @@
-var worksmith = require('..')
 var _ = require('lodash')
 var async = require('async')
-packageJson = require('../package.json')
-
-console.log('Stress tests for worksmith version ', packageJson.version)
+var requireVersion = require('require-version')
+var myModule = 'worksmith'
 
 var SAMPLE_SIZE = 100
 
-try {
-    worksmith.use("lodash", worksmith.createAdapter(require('lodash')))
-    var workflow = worksmith("./stress-test/stress-workflows/workflow1.js")
-    console.log('About to execute workflow1')
-    calculateAverageExecTime(workflow, function(average) {
-        console.log('The average execution time is: ', average, ' ms')
-    })
-} catch(e) {
-    console.error('There was an error setting up a workflow: ', e)
+requireVersion.execute(myModule, 3, function(module, version, next) {
+    console.log('Executing tests for ', module, ' v', version)
+    runTests(require(myModule), next)
+}, function(err) {
+    if (err) console.log('Error: ', err)
+    console.log('END')
+})
+
+function runTests(worksmith, next) {
+    try {
+        worksmith.use("lodash", worksmith.createAdapter(require('lodash')))
+        var workflow = worksmith("./stress-test/stress-workflows/workflow1.js")
+        console.log('About to execute workflow1')
+        calculateAverageExecTime(workflow, function(average) {
+            console.log('The average execution time is: ', average, ' ms')
+            next()
+        })
+    } catch(e) {
+        next(e)
+    }
 }
 
 function calculateAverageExecTime(workflow, next) {
