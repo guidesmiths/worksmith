@@ -31,6 +31,6 @@
   },
   "devDependencies": {
     "mocha": "^2.2.5",
-    "require-version": "^1.0.0"
+    "require-version": "^1.1.0"
   }
 }

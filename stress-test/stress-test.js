@@ -3,11 +3,12 @@ var async = require('async')
 var requireVersion = require('require-version')
 var myModule = 'worksmith'
 
-var SAMPLE_SIZE = 100
+var SAMPLE_SIZE = 10
+var VERSION_LIMIT = 3
 
-requireVersion.execute(myModule, 3, function(module, version, next) {
-    console.log('Executing tests for ', module, ' v', version)
-    runTests(require(myModule), next)
+requireVersion.runLast(myModule, VERSION_LIMIT, function(module, version, next) {
+    console.log('Executing tests for ', myModule, ' v', version)
+    runTests(module, next)
 }, function(err) {
     if (err) console.log('Error: ', err)
     console.log('END')
