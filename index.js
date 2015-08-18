@@ -269,7 +269,9 @@ var workflow = {
                     var originalDone = context.originalTerminate || done;
                     var donePosition = context.completionStack.indexOf(originalDone);
                     context.completionStack.splice(donePosition, 1)
-                    done(err, res, context)
+                    setImmediate(function() {
+                        done(err, res, context)
+                    })
                 }
 
                 debug("Executing WF %s", getStepName(workflowDefinition))
