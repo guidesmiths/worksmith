@@ -268,4 +268,25 @@ describe("WorkSmith API", function() {
             done();
         })
     })
+    
+    xit("should not call wf.complete twice on an throw", function(done) {
+        var def = [
+            {
+                task: function(step) {
+                    return function(context) {
+                        return function execute(done) {
+                            done();
+                        }
+                    }
+                }
+            }
+        ]
+        var flag = [];
+        var wf = workflow(def)
+        wf({}, function(err, res) {
+            flag.push({})
+            throw new Error("error")
+        });
+        //flag.length == 1
+    })
 })
