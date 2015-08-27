@@ -93,7 +93,7 @@ Interpolator.prototype.rules = {
         },
         {
             name: "legacy {template:'...'} field resolver",
-            match: function(value) { return "template" in value },
+            match: function(value) { return Object.keys(value).length === 1 && "template" in value },
             action: function(interpolator, context, value) {
                 console.warn("obsoleted functionality: { template: value }, use [hbs]..[/hbs] instead")
                 var template = value.template
