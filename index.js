@@ -178,7 +178,7 @@ var workflow = {
 
 
             return function execute(done) {
-
+                var wfStartTime = new Date().getTime()
 
                 if (!checkCondition(context))
                     return done()
@@ -266,6 +266,9 @@ var workflow = {
                     }
 
                     debug("Finished executing WF %s", getStepName(workflowDefinition))
+                    if (context.$$$stats) {
+                      context.$$$stats.push(getStepName(workflowDefinition) + " execution time: " + (new Date().getTime() - wfStartTime) +"ms")
+                    }
                     var originalDone = context.originalTerminate || done;
                     var donePosition = context.completionStack.indexOf(originalDone);
                     context.completionStack.splice(donePosition, 1)
