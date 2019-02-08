@@ -7,7 +7,7 @@ module.exports = function(definition) {
             var jsonPath = context.get(definition.path)
             jsonPath = path.resolve(jsonPath)
             var content = require(jsonPath)
-            content = _.extend({}, content)
+            content = _.assignIn({}, content)
             done(null, content)
         }
     }

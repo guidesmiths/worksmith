@@ -66,7 +66,7 @@ var workflow = {
         }
     },
     configure: function(options) {
-        _.extend(settings, options);
+        _.assignIn(settings, options);
     },
 
     hasLogLevel: function(level) {
@@ -306,6 +306,6 @@ var workflow = {
 }
 
 
-_.extend(wfLoader, workflow);
+_.assignIn(wfLoader, workflow);
 
 module.exports = wfLoader;
