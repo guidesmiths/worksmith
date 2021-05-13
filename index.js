@@ -289,6 +289,9 @@ var workflow = {
     },
 
     setValue: function (object, path, value) {
+        if (path.includes('__proto__') || path.includes('constructor') || path.includes('prototype')) {
+			return false;
+		}
         var parts = path.split('.');
         path = path.replace(/\[/g, ".").replace(/\]/g, "")
         var part;
